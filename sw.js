@@ -1,5 +1,5 @@
 // 천하쟁패 — 오프라인에서도 게임이 켜지도록 앱 파일을 캐시합니다. 저장 데이터는 휴대폰(localStorage)에 있습니다.
-const CACHE = 'chunha-v2';
+const CACHE = 'chunha-v4';
 const SHELL = [
   './',
   './index.html',
@@ -30,10 +30,9 @@ self.addEventListener('fetch', (e) => {
   e.respondWith(
     fetch(e.request)
       .then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE).then((c) => c.put(e.request, copy));
+        if (res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(e.request, copy)); }
         return res;
       })
-      .catch(() => caches.match(e.request).then((r) => r || caches.match('./index.html')))
+      .catch(() => caches.match(e.request).then((r) => r || (e.request.destination === 'image' ? Response.error() : caches.match('./index.html'))))
   );
 });

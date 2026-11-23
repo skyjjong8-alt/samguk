@@ -66,6 +66,7 @@ b{font-weight:700}
 .ex{font-size:12px;color:var(--gold);margin-top:2px}
 .face{flex:none;width:48px;height:48px;border-radius:50%;background:var(--c);display:flex;align-items:center;justify-content:center;border:2.5px solid var(--c);position:relative;overflow:hidden}
 .face svg,.face img{width:100%;height:100%;display:block;object-fit:cover}
+.face .pimg{position:absolute;inset:0}
 .face span{font-weight:900;color:#fff;text-shadow:0 1px 2px #000a;font-size:16px}
 .face.r5{box-shadow:0 0 0 2px #ffd166,0 0 10px #ffd166aa}
 .face.r4{box-shadow:0 0 0 2px #c79bff}
@@ -81,6 +82,35 @@ b{font-weight:700}
 .capb{display:flex;gap:6px;margin:-2px 0 10px}
 .capb .btn{height:40px;margin-top:0;font-size:14px}
 .capr{text-align:center;font-weight:800;padding:8px;border-radius:10px;margin:-2px 0 10px;background:var(--panel)}
+.mapwrap{position:relative;width:min(100%,calc(52vh * 340 / 338));aspect-ratio:340/338;margin:0 auto}
+.mapwrap .map{width:100%;height:100%;max-height:none}
+.rmark{position:absolute;transform:translate(-50%,-50%);pointer-events:none;z-index:1}
+.rmark .face{width:27px;height:27px;border-width:2px;box-shadow:0 0 0 1.5px #ffe39a,0 2px 6px #000a}
+.rmark i{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:11px;font-style:normal}
+.mbadge{position:absolute;transform:translate(-50%,-50%);background:#e8604e;color:#fff;font-size:10px;font-weight:800;min-width:16px;height:16px;border-radius:8px;text-align:center;line-height:16px;padding:0 3px;pointer-events:none;z-index:2;box-shadow:0 1px 3px #000a}
+.mstar{position:absolute;transform:translate(-50%,-50%);color:#ffd166;font-size:13px;text-shadow:0 0 3px #000;pointer-events:none;z-index:2}
+.lords{display:flex;gap:6px;overflow-x:auto;padding:8px 12px 2px;scrollbar-width:none}
+.lord{display:flex;align-items:center;gap:5px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:3px 10px 3px 3px;white-space:nowrap;flex:none}
+.lord.on{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+.lord span{display:flex;flex-direction:column;align-items:flex-start;line-height:1.15;font-size:12px}
+.lord small{color:var(--dim);font-size:10px}
+.tip{display:flex;align-items:center;gap:8px;margin:8px 12px 0;padding:6px 10px 6px 6px;background:#2a2016;border:1px solid var(--line);border-radius:12px;font-size:13px;line-height:1.35}
+.tip .face{width:34px;height:34px}
+.tip b{color:var(--gold)}
+.advh{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+.bubble{background:#f3e7cf;color:#2a1a08;border-radius:14px;padding:8px 12px;font-size:14px;font-weight:700;position:relative;margin-bottom:10px}
+.bubble:before{content:'';position:absolute;top:-8px;left:30px;border:8px solid transparent;border-top:0;border-bottom-color:#f3e7cf}
+.adv{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:6px;font-size:14px;line-height:1.45}
+.adv i{font-style:normal;font-size:18px;line-height:1.2}
+.adv.hi{border-color:var(--red)}
+#act .b-adv{flex:.55;background:#3a2d1f;color:var(--text);border:1px solid var(--line)!important}
+.fsel{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fsel .fcard{margin:0;padding:8px;gap:8px}
+.fsel .fcard .face{width:46px;height:46px}
+.fsel .fcard .fi b{font-size:15px}
+.fsel .fcard .fi div{font-size:11px;line-height:1.35;margin-top:2px;white-space:nowrap}
+.fsel .fcard .fi{min-width:0}
+.diff{white-space:nowrap}
 .face.gray>*{filter:grayscale(.85) brightness(.6)}
 .face.unk{background:#2a2016;border-style:dashed}
 .face.big{width:96px;height:96px}
@@ -163,7 +193,7 @@ input[type=range]{width:100%;accent-color:var(--gold);height:30px}
 <body>
 <div id="top"></div>
 <div id="view"></div>
-<div id="act"><button class="b-auto" onclick="autoAll()">⚡ 자동 내정</button><button class="b-end" onclick="endTurn()">턴 종료 ▶</button></div>
+<div id="act"><button class="b-adv" onclick="openAdvisor()">💬 참모</button><button class="b-auto" onclick="autoAll()">⚡ 자동 내정</button><button class="b-end" onclick="endTurn()">턴 종료 ▶</button></div>
 <div id="nav">
   <button data-t="map" onclick="tab('map')"><i>🗺️</i>지도</button>
   <button data-t="gens" onclick="tab('gens')"><i>⚔️</i>장수</button>
@@ -319,8 +349,8 @@ const SPECIAL={
   제갈량:{hat:'scarf',fan:1,beard:'thin',robe:'#e8e2d0'},
   방통:{beard:'short',hat:'guan'},
   여포:{helm:'plume',beard:'none',young:1},
-  조운:{helm:'silver',beard:'none',young:1,plume:'#f2f2f2'},
-  마초:{helm:'silver',beard:'none',young:1,plume:'#f2f2f2'},
+  조운:{helm:'silver',beard:'none',young:1,plume:'#f2f2f2',hair:'#dfe4ea',longHair:1},
+  마초:{helm:'silver',beard:'none',young:1,plume:'#f2f2f2',hair:'#8a6a4a',longHair:1},
   손책:{helm:'red',beard:'none',young:1},
   손권:{hat:'crown',eye:'#2f8f8a',beard:'short',beardColor:'#7a4a24',hair:'#5a3a1e'},
   주유:{young:1,beard:'none',hat:'band'},
@@ -376,65 +406,121 @@ function colorOf(g){return g.force?S.forces[g.force].color:'#8b7355'}
 /* ===================== 그리기 조각 ===================== */
 let PHOTOS={};try{PHOTOS=JSON.parse(localStorage.getItem('chunha_photos')||'{}');}catch(e){}
 function savePhotos(){try{localStorage.setItem('chunha_photos',JSON.stringify(PHOTOS));return true;}catch(e){toast('사진 저장 공간이 부족합니다');return false;}}
+// portraits 폴더에 '장수이름.jpg'(또는 .png)를 넣으면 그 그림을 씀. 없으면 자동 그림.
+const MISSING=new Set();
+function pimgErr(el,n){if(/\.jpg$/.test(el.getAttribute('src'))){el.setAttribute('src','portraits/'+encodeURIComponent(n)+'.png');return;}MISSING.add(n);el.remove();}
 function face(g,cls=''){
   const r=rarity(g),col=colorOf(g);
-  const inner=PHOTOS[g.name]?`<img src="${PHOTOS[g.name]}" alt="">`:portrait(g.name,col);
+  const file=MISSING.has(g.name)?'':`<img class="pimg" src="portraits/${encodeURIComponent(g.name)}.jpg" onerror="pimgErr(this,'${g.name}')" alt="">`;
+  const inner=PHOTOS[g.name]?`<img src="${PHOTOS[g.name]}" alt="">`:portrait(g.name,col)+file;
   return `<div class="face r${r} ${cls}" style="--c:${col}">${inner}</div>`;
 }
 function shade(hex,amt){const c=parseInt(hex.slice(1),16);const f=v=>clamp(Math.round(amt<0?v*(1+amt):v+(255-v)*amt),0,255);
   return '#'+((1<<24)|(f(c>>16)<<16)|(f(c>>8&255)<<8)|f(c&255)).toString(16).slice(1);}
 function rng(seed){let s=seed||1;return()=>{s=(Math.imul(s,1664525)+1013904223)>>>0;return s/4294967296;};}
 const PCACHE={};
+function mirror(d){return d.replace(/(-?\d+\.?\d*),(-?\d+\.?\d*)/g,(m,x,y)=>`${+(100-x).toFixed(2)},${y}`);}
 function portrait(n,col){
   const key=n+col;if(PCACHE[key])return PCACHE[key];
   const b=BASE[n]||{war:50,int:50},sp=SPECIAL[n]||{},R=rng(hash(n));
   const P=a=>a[Math.floor(R()*a.length)];
-  const skin=sp.skin||P(['#f1c9a0','#e9bb90','#dcaa7e','#cf9a6e']);
-  const hair=sp.hair||P(['#1d1714','#2b211b','#3a2a1e','#241a14']);
+  const id='p'+hash(key).toString(36);
+  const skin=sp.skin||P(['#f0c8a0','#e6b78e','#d9a67c','#cc976c']);
+  const hair=sp.hair||P(['#1a1512','#2a201a','#38281c','#1f1a1c']);
   const role=sp.role||(b.war>=b.int+10?'war':b.int>=b.war+10?'sch':'mid');
   const young=sp.young||R()<.3;
   const beard=sp.beard||(young?'none':P(['goatee','full','short','thin','none','goatee']));
-  let s=`<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><rect width="64" height="64" fill="${shade(col,-.45)}"/><circle cx="32" cy="24" r="24" fill="${shade(col,.1)}" opacity=".45"/>`;
-  if(role==='sch'){const robe=sp.robe||P(['#2d3a4a','#3b2d4a','#2f4a3a','#4a3a2a','#5a2a2a']);
-    s+=`<path d="M6,64 C8,50 19,45 32,45 C45,45 56,50 58,64Z" fill="${robe}"/><path d="M25,46 L32,58 L39,46" fill="none" stroke="${robe==='#e8e2d0'?'#3a5a7a':'#f3ead8'}" stroke-width="2.4"/>`;}
-  else{const ar=shade(col,-.2),tr=shade(col,.35);
-    s+=`<path d="M6,64 C8,50 19,45 32,45 C45,45 56,50 58,64Z" fill="${ar}"/><path d="M15,57 Q32,51 49,57 M17,62 Q32,56 47,62" stroke="${tr}" stroke-width="1.5" fill="none"/><ellipse cx="13" cy="53" rx="7.5" ry="5" fill="${tr}"/><ellipse cx="51" cy="53" rx="7.5" ry="5" fill="${tr}"/>`;}
-  s+=`<rect x="28" y="38" width="8" height="9" fill="${shade(skin,-.15)}"/>`;
-  const er=sp.ears?3.6:2.4;
-  s+=`<ellipse cx="20.5" cy="32" rx="${er}" ry="${er+1}" fill="${skin}"/><ellipse cx="43.5" cy="32" rx="${er}" ry="${er+1}" fill="${skin}"/>`;
-  s+=`<ellipse cx="32" cy="31" rx="${sp.fat?13:11}" ry="12.5" fill="${skin}"/>`;
-  const ey=sp.eye||'#1a1410',angry=b.war>=85,bw=sp.brow||(angry?2.2:1.4);
-  s+=`<ellipse cx="27.5" cy="31" rx="1.5" ry="1.3" fill="${ey}"/><ellipse cx="36.5" cy="31" rx="1.5" ry="1.3" fill="${ey}"/>`;
-  s+=angry?`<path d="M23.5,26.5 L30,28.3 M40.5,26.5 L34,28.3" stroke="${hair}" stroke-width="${bw}" stroke-linecap="round"/>`
-          :`<path d="M24,27.5 Q27,26 30,27.3 M40,27.5 Q37,26 34,27.3" stroke="${hair}" stroke-width="${bw}" fill="none" stroke-linecap="round"/>`;
-  s+=`<path d="M32,31 L31,36 L33,36" fill="none" stroke="${shade(skin,-.3)}" stroke-width="1"/><path d="M29.5,39.5 Q32,40.5 34.5,39.5" stroke="#7a3b2e" stroke-width="1.1" fill="none"/>`;
-  if(sp.patch)s+=`<path d="M20,25 L44,29" stroke="#111" stroke-width="1"/><ellipse cx="27.5" cy="31" rx="3.2" ry="2.8" fill="#111"/>`;
+  const head=sp.hat||(sp.helm&&'helm')||(RULERS.has(n)?'crown':role==='war'?(R()<.8?'helm':'band'):role==='sch'?P(['guan','guan','scarf','hair']):P(['helm','band','hair','guan']));
+  const longHair=sp.longHair!==undefined?sp.longHair:((young&&role!=='sch')||R()<.2);
+  const spear=role==='war'&&R()<.75;
+  const M={silver:['#ffffff','#cfd6de','#7d8690','#353b43'],white:['#ffffff','#e3e7ec','#a3abb5','#4e555e'],red:['#ffc2b3','#c4402f','#7a1f16','#3a0d08'],gold:['#fff2c2','#e0b45a','#9a6f24','#4a3210']}[sp.helm]||['#eef1f4','#a2abb5','#5b636c','#2a2e34'];
+  const T=['#fff3c4','#e0b45a','#7d5a1c'];
+  const sk=[shade(skin,.2),skin,shade(skin,-.25)];
+  const cm=shade(col,-.25),cl=shade(col,.3);
+  const u=s=>`url(#${id}${s})`;
+  let s=`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs>
+  <radialGradient id="${id}b" cx=".32" cy=".28" r=".95"><stop offset="0" stop-color="${shade(col,-.05)}"/><stop offset=".5" stop-color="${shade(col,-.62)}"/><stop offset="1" stop-color="#04060a"/></radialGradient>
+  <linearGradient id="${id}s" x1="0" x2="1"><stop offset="0" stop-color="${sk[0]}"/><stop offset=".5" stop-color="${sk[1]}"/><stop offset="1" stop-color="${sk[2]}"/></linearGradient>
+  <linearGradient id="${id}m" x1="0" y1="0" x2=".7" y2="1"><stop offset="0" stop-color="${M[0]}"/><stop offset=".35" stop-color="${M[1]}"/><stop offset=".75" stop-color="${M[2]}"/><stop offset="1" stop-color="${M[3]}"/></linearGradient>
+  <linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${T[0]}"/><stop offset=".5" stop-color="${T[1]}"/><stop offset="1" stop-color="${T[2]}"/></linearGradient>
+  <linearGradient id="${id}h" x1="0" x2="1"><stop offset="0" stop-color="${shade(hair,.45)}"/><stop offset=".45" stop-color="${hair}"/><stop offset="1" stop-color="${shade(hair,-.35)}"/></linearGradient>
+  <radialGradient id="${id}v" r=".72"><stop offset=".62" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".7"/></radialGradient>
+  </defs><rect width="100" height="100" fill="${u('b')}"/>
+  <path d="M-5,30 L105,2 L105,14 L-5,46Z" fill="#fff" opacity=".05"/><ellipse cx="78" cy="30" rx="30" ry="10" fill="#fff" opacity=".04"/>`;
+  // 무기 (창)
+  if(spear)s+=`<path d="M60,104 L95,8" stroke="${shade(col,-.1)}" stroke-width="3.4"/><path d="M60,104 L95,8" stroke="#fff" stroke-width=".7" opacity=".35"/><path d="M92.5,15 L99,-2 L96.5,17Z" fill="${u('m')}"/><path d="M90,20 L98,17" stroke="${T[1]}" stroke-width="2"/>`;
+  // 망토
+  s+=`<path d="M0,100 C3,74 18,63 50,61 C82,63 97,74 100,100Z" fill="${cm}"/><path d="M14,100 C16,86 22,78 30,74 M86,100 C84,86 78,78 70,74" stroke="${shade(col,-.55)}" stroke-width="1.5" fill="none" opacity=".6"/>`;
+  // 긴 머리 (뒤)
+  if(longHair)s+=`<path d="M35,32 C25,46 22,68 17,94 C25,90 31,82 35,70 C34,58 35,46 38,38Z" fill="${u('h')}"/><path d="${mirror('M35,32 C25,46 22,68 17,94 C25,90 31,82 35,70 C34,58 35,46 38,38Z')}" fill="${u('h')}"/>
+    <path d="M32,44 C27,58 25,72 21,88 M36,50 C32,62 31,72 28,82" stroke="${shade(hair,.5)}" stroke-width=".7" fill="none" opacity=".6"/>`;
+  // 목
+  s+=`<path d="M43,55 L43,69 L57,69 L57,55Z" fill="${sk[2]}"/><path d="M43,58 Q50,65 57,58 L57,63 Q50,68 43,63Z" fill="#000" opacity=".22"/>`;
+  // 몸
+  if(role==='sch'&&head!=='helm'){
+    const robe=sp.robe||P(['#2b3a52','#3b2d4a','#24453a','#4a3a2a','#5a2626']);
+    s+=`<path d="M10,100 C12,82 28,70 50,68 C72,70 88,82 90,100Z" fill="${robe}"/><path d="M50,68 C72,70 88,82 90,100 L50,100Z" fill="#000" opacity=".22"/>
+    <path d="M38,67 L50,90 L62,67 L57.5,66 L50,82 L42.5,66Z" fill="${robe==='#e8e2d0'?'#3a5a7a':'#f1e8d6'}"/><path d="M33,70 L50,100 M67,70 L50,100" stroke="${u('g')}" stroke-width="2.2"/>
+    <path d="M20,84 Q30,80 36,86 M80,84 Q70,80 64,86" stroke="#000" stroke-width="1" opacity=".25" fill="none"/>`;
+  }else{
+    s+=`<path d="M12,100 C14,82 28,70 50,68 C72,70 86,82 88,100Z" fill="${u('m')}"/>`;
+    let sc='';for(const y of [78,84,90,96])for(let x=20+(y%12?4:0);x<80;x+=8)sc+=`M${x},${y} q4,4.5 8,0 `;
+    s+=`<path d="${sc}" stroke="${M[3]}" stroke-width=".8" fill="none" opacity=".55"/>
+    <circle cx="50" cy="84" r="5.5" fill="${u('g')}" stroke="${T[2]}" stroke-width=".8"/><circle cx="50" cy="84" r="2.6" fill="${shade(col,-.3)}"/>
+    <path d="M37,65 Q50,74 63,65 L65,71 Q50,80 35,71Z" fill="${u('g')}"/>`;
+    const pl='M3,99 C1,80 12,67 34,69 C34,80 26,92 3,99Z',pa='M8,91 Q18,79 32,76 M5,95 Q16,85 30,83',pr='M3,99 C1,80 12,67 34,69';
+    s+=`<path d="${pl}" fill="${u('m')}" stroke="${M[3]}" stroke-width=".8"/><path d="${pa}" stroke="${M[3]}" stroke-width=".8" fill="none"/><path d="${pr}" stroke="${u('g')}" stroke-width="1.8" fill="none"/>
+    <path d="${mirror(pl)}" fill="${u('m')}" stroke="${M[3]}" stroke-width=".8"/><path d="${mirror(pa)}" stroke="${M[3]}" stroke-width=".8" fill="none"/><path d="${mirror(pr)}" stroke="${u('g')}" stroke-width="1.8" fill="none"/>`;
+  }
+  // 귀·얼굴
+  const fw=sp.fat?2.5:0;
+  s+=`<ellipse cx="${35.4-fw}" cy="43" rx="${sp.ears?3.6:2.5}" ry="${sp.ears?5.5:4}" fill="${sk[1]}"/><ellipse cx="${64.6+fw}" cy="43" rx="${sp.ears?3.6:2.5}" ry="${sp.ears?5.5:4}" fill="${sk[2]}"/>`;
+  s+=`<path d="M${36-fw},40 C${36-fw},27 42,21 50,21 C58,21 ${64+fw},27 ${64+fw},40 C${64+fw},50 61,57 55,61 Q50,63.5 45,61 C39,57 ${36-fw},50 ${36-fw},40Z" fill="${u('s')}"/>`;
+  s+=`<path d="M58.5,35 C64,40 63,52 55.5,60 C58.5,52 59.5,44 58.5,35Z" fill="#000" opacity=".16"/><path d="M38,36 C37.5,30 42,24 48,22.5" stroke="#fff" stroke-width="1" fill="none" opacity=".35"/>`;
+  // 눈·눈썹
+  const ey=sp.eye||'#2a1a10',angry=b.war>=85,bw=sp.brow?3:(angry?2.4:1.6);
+  const eye=(cx,d)=>`<path d="M${cx-3.6},42 Q${cx},39.4 ${cx+3.6},42 Q${cx},43.7 ${cx-3.6},42Z" fill="#efe6da"/><circle cx="${cx+d*.3}" cy="41.7" r="1.55" fill="${ey}"/><circle cx="${cx+d*.3}" cy="41.7" r=".7" fill="#000"/><circle cx="${cx-.3}" cy="41.1" r=".45" fill="#fff"/><path d="M${cx-3.9},42 Q${cx},38.8 ${cx+3.9},41.6" stroke="#1a120c" stroke-width="1.1" fill="none"/>`;
+  s+=eye(44.5,1)+eye(55.5,-1);
+  const br=angry?'M39.5,36.6 L48.2,39':'M40,38 Q44,36.4 48,37.9';
+  s+=`<path d="${br} ${mirror(br).replace('M','M')}" stroke="${hair}" stroke-width="${bw}" stroke-linecap="round" fill="none"/>`;
+  s+=`<path d="M50,42 L48.6,50.5 Q50,51.7 51.7,50.5" fill="none" stroke="${sk[2]}" stroke-width=".9"/><path d="M49.3,43 L48.5,49" stroke="${sk[0]}" stroke-width=".8" opacity=".7"/>
+  <path d="M46,55.2 Q50,56.5 54,55.2" stroke="#6e3328" stroke-width="1.1" fill="none"/><path d="M47.5,57.2 Q50,58 52.5,57.2" stroke="${sk[2]}" stroke-width=".7" fill="none"/>`;
+  if(sp.patch)s+=`<path d="M34,35 L66,41" stroke="#111" stroke-width="1.2"/><ellipse cx="44.5" cy="42" rx="4.8" ry="4" fill="#111"/>`;
+  // 수염 (이전 그림을 확대해서 사용)
   const bc=sp.beardColor||hair,mu=`<path d="M27,38.5 Q32,36.5 37,38.5" stroke="${bc}" stroke-width="2" fill="none"/>`;
-  s+={goatee:`<path d="M29,41 Q32,48 35,41 Z" fill="${bc}"/><path d="M27,38.5 Q32,36.5 37,38.5" stroke="${bc}" stroke-width="1.5" fill="none"/>`,
+  const bd={goatee:`<path d="M29,41 Q32,48 35,41 Z" fill="${bc}"/><path d="M27,38.5 Q32,36.5 37,38.5" stroke="${bc}" stroke-width="1.5" fill="none"/>`,
     short:`<path d="M22,34 Q23,45 32,46 Q41,45 42,34 Q40,41 32,42 Q24,41 22,34Z" fill="${bc}"/>`,
     full:`<path d="M21,31 Q21,49 32,50 Q43,49 43,31 Q41,42 35,41 L29,41 Q23,42 21,31Z" fill="${bc}"/>`+mu,
     long:`<path d="M22,33 Q22,44 27,47 Q28,60 32,63 Q36,60 37,47 Q42,44 42,33 Q40,42 35,41 L29,41 Q24,42 22,33Z" fill="${bc}"/>`+mu,
     thin:`<path d="M27.5,38.6 Q30,37.4 31.5,38.3 M36.5,38.6 Q34,37.4 32.5,38.3" stroke="${bc}" stroke-width="1" fill="none"/><path d="M31,42 L32,47 L33,42" fill="${bc}"/>`,
-    spiky:`<path d="M20,31 L19,38 L22,40 L20,45 L25,45 L24,50 L29,48 L32,53 L35,48 L40,50 L39,45 L44,45 L42,40 L45,38 L44,31 Q41,42 35,41 L29,41 Q23,42 20,31Z" fill="${bc}"/>`+mu,
-    none:''}[beard]||'';
-  const head=sp.hat||(sp.helm&&'helm')||(RULERS.has(n)?'crown':role==='war'?(R()<.75?'helm':'band'):role==='sch'?P(['guan','guan','scarf','hair']):P(['helm','band','hair','guan']));
-  const cap=`<path d="M20,31 C18,15 46,15 44,31 C42,23 36,21 32,21 C28,21 22,23 20,31Z" fill="${hair}"/>`;
-  const tc=shade(col,.15);
+    spiky:`<path d="M20,31 L19,38 L22,40 L20,45 L25,45 L24,50 L29,48 L32,53 L35,48 L40,50 L39,45 L44,45 L42,40 L45,38 L44,31 Q41,42 35,41 L29,41 Q23,42 20,31Z" fill="${bc}"/>`+mu}[beard];
+  if(bd)s+=`<g transform="translate(50 42) scale(1.4) translate(-32 -31.5)">${bd}<path d="M30,44 L31,52 M34,44 L33,52" stroke="${shade(bc,.4)}" stroke-width=".4" opacity=".5"/></g>`;
+  // 머리·투구
+  const cap=`<path d="M35,42 C33,19 67,19 65,42 C62,30 56,27 50,27 C44,27 38,30 35,42Z" fill="${u('h')}"/>`;
+  const bangs=`<path d="M45,28 C43,33 41,37 38.5,41 M50,28 C49,33 47.5,36 46,39 M55,28 C57,33 59,37 61.5,41" stroke="${u('h')}" stroke-width="1.8" stroke-linecap="round" fill="none"/>`;
   if(head==='helm'){
-    const hc={silver:'#c9ced6',white:'#e5e7eb',red:'#b33a2e'}[sp.helm]||'#8b8f96';
-    s+=`<path d="M18.5,31 C17,12 47,12 45.5,31 L45.5,27 Q32,22 18.5,27Z" fill="${hc}"/><path d="M18.5,27 Q32,22 45.5,27 L45.5,29.5 Q32,24.5 18.5,29.5Z" fill="${tc}"/><path d="M32,11 L32,18" stroke="#d4a64a" stroke-width="2"/>`;
-    s+=sp.helm==='plume'?`<path d="M30,13 C22,2 12,0 3,3 C14,3 22,7 29,15Z M34,13 C42,2 52,0 61,3 C50,3 42,7 35,15Z" fill="#c0392b"/>`
-                        :`<path d="M32,12 C29,6 31,3 32,2 C33,3 35,6 32,12Z" fill="${sp.plume||'#c0392b'}"/>`;
-  }else if(head==='crown')s+=cap+`<path d="M24,19 L24,11 L28,14 L32,9 L36,14 L40,11 L40,19Z" fill="#e0b45a" stroke="#8a6420" stroke-width=".8"/><circle cx="32" cy="15" r="1.6" fill="#c0392b"/>`;
-  else if(head==='guan')s+=cap+`<rect x="27.5" y="11" width="9" height="9" rx="1.2" fill="#1a1a1a"/><path d="M24,16 L40,16" stroke="#d4a64a" stroke-width="1"/>`;
-  else if(head==='scarf')s+=`<path d="M19.5,30 C17,13 47,13 44.5,30 C42,21 22,21 19.5,30Z" fill="#3a6b8f"/><path d="M44,24 Q52,30 50,40 Q47,32 43,28Z" fill="#3a6b8f"/><path d="M20,24 L44,24" stroke="#f3ead8" stroke-width="1"/>`;
-  else if(head==='green')s+=`<path d="M19.5,30 C17,11 47,11 44.5,30 C42,21 22,21 19.5,30Z" fill="#2f7d46"/><path d="M19.5,25 L44.5,25" stroke="#e0b45a" stroke-width="1.4"/>`;
-  else if(head==='band')s+=cap+`<path d="M20,24.5 Q32,20 44,24.5" stroke="${tc}" stroke-width="3" fill="none"/><path d="M44,24 L50,30" stroke="${tc}" stroke-width="2"/>`;
-  else if(head==='taoist')s+=cap+`<path d="M26,19 L32,8 L38,19Z" fill="#e8e2d0"/>`;
-  else if(head==='bald')s+=`<path d="M21,26 C22,18 42,18 43,26" fill="none" stroke="${shade(skin,-.15)}" stroke-width="1"/>`;
-  else s+=cap+`<circle cx="32" cy="14" r="4.2" fill="${hair}"/><rect x="29" y="15.5" width="6" height="1.6" fill="#d4a64a"/>`;
-  if(sp.fan)s+=`<path d="M46,64 L50,50 C52,42 62,42 62,50 L54,64Z" fill="#f5f1e6" stroke="#cfc6b0" stroke-width=".8"/><path d="M50,64 L55,48 M53,64 L58,47" stroke="#cfc6b0" stroke-width=".6"/>`;
-  return PCACHE[key]=s+'</svg>';
+    if(longHair)s+=bangs;
+    const ch='M32,37 C30,44 30,52 34,58 L37.5,56 C35.5,50 35.5,44 36.5,39Z',wg='M32.5,30 C24,26 19,19 18,10 C25,17 29,21 34.5,24.5Z';
+    s+=`<path d="${wg}" fill="${u('g')}"/><path d="${mirror(wg)}" fill="${u('g')}"/>
+    <path d="M32,42 C30,13 70,13 68,42 L68,35 Q50,27 32,35Z" fill="${u('m')}"/>
+    <path d="M50,14 L50,30 M40,18.5 Q44,25 42,31 M60,18.5 Q56,25 58,31" stroke="${M[3]}" stroke-width=".7" opacity=".6" fill="none"/>
+    <path d="M38,22 Q44,16 52,16" stroke="#fff" stroke-width="1.2" opacity=".5" fill="none"/>
+    <path d="M31.5,35 Q50,26.5 68.5,35 L68.5,39 Q50,31 31.5,39Z" fill="${u('g')}"/>
+    <path d="M50,25.5 L53.2,30.5 L50,35 L46.8,30.5Z" fill="${shade(col,.05)}" stroke="${T[2]}" stroke-width=".6"/>
+    <path d="${ch}" fill="${u('m')}" stroke="${M[3]}" stroke-width=".6"/><path d="${mirror(ch)}" fill="${u('m')}" stroke="${M[3]}" stroke-width=".6"/>`;
+    s+=sp.helm==='plume'?`<path d="M47,16 C38,3 22,-1 4,5 C22,3 36,8 46,19Z M53,16 C62,3 78,-1 96,5 C78,3 64,8 54,19Z" fill="#b8322a"/><path d="M40,10 L37,6 M32,7 L30,3 M24,5 L22,1 M60,10 L63,6 M68,7 L70,3 M76,5 L78,1" stroke="#7a1d17" stroke-width=".8"/><circle cx="50" cy="16" r="2.4" fill="${u('g')}"/>`
+      :`<path d="M50,15 C45,6 48.5,1 50,-1 C51.5,1 55,6 50,15Z" fill="${sp.plume||'#c0392b'}"/><circle cx="50" cy="15.5" r="2.2" fill="${u('g')}"/>`;
+  }else if(head==='crown')s+=cap+`<rect x="37" y="26" width="26" height="3.5" rx="1" fill="${u('g')}"/><path d="M38,27 L38,16 L43,20.5 L50,12 L57,20.5 L62,16 L62,27Z" fill="${u('g')}" stroke="${T[2]}" stroke-width=".8"/><circle cx="50" cy="21.5" r="2.2" fill="#c0392b"/><circle cx="43" cy="24" r="1" fill="#3a8fd0"/><circle cx="57" cy="24" r="1" fill="#3a8fd0"/>`;
+  else if(head==='guan')s+=cap+`<path d="M43,15 L57,15 L56,28 L44,28Z" fill="#141414"/><path d="M44,17 L56,17" stroke="#444" stroke-width=".6"/><path d="M37,22 L63,22" stroke="${u('g')}" stroke-width="1.3"/>`;
+  else if(head==='scarf')s+=`<path d="M34,42 C31,17 69,17 66,42 C62,29 38,29 34,42Z" fill="#33607f"/><path d="M65,33 Q79,44 75,62 Q70,47 63,38Z" fill="#2a4f69"/><path d="M35,34 Q50,27 65,34" stroke="#f1e8d6" stroke-width="1.2" fill="none"/><path d="M40,22 Q46,19 52,19" stroke="#fff" opacity=".3" fill="none"/>`;
+  else if(head==='green')s+=`<path d="M34,42 C30,13 70,13 66,42 C62,28 38,28 34,42Z" fill="#2f7d46"/><path d="M60,18 C66,24 67,32 66,42 C64,32 62,26 58,22Z" fill="#000" opacity=".2"/><path d="M34.5,35 Q50,27 65.5,35" stroke="${u('g')}" stroke-width="1.8" fill="none"/>`;
+  else if(head==='band')s+=cap+(longHair?bangs:'')+`<path d="M35,34 Q50,27 65,34" stroke="${cl}" stroke-width="4" fill="none"/><path d="M65,33 L74,45 M65,34 L70.5,48" stroke="${cl}" stroke-width="2.4"/>`;
+  else if(head==='taoist')s+=cap+`<path d="M42,27 L50,9 L58,27Z" fill="#ece5d2"/><path d="M50,9 L58,27 L52,27Z" fill="#000" opacity=".15"/>`;
+  else if(head==='bald')s+=`<ellipse cx="45" cy="27" rx="6" ry="3" fill="#fff" opacity=".25"/>`;
+  else s+=cap+(longHair?bangs:'')+`<circle cx="50" cy="20" r="5.5" fill="${u('h')}"/><rect x="46" y="22" width="8" height="2.2" rx="1" fill="${u('g')}"/>`;
+  if(sp.fan)s+=`<path d="M70,100 L75,80 C78,66 97,66 97,80 L86,100Z" fill="#f5f1e6" stroke="#cfc6b0" stroke-width=".8"/><path d="M75,100 L82,74 M80,100 L88,72 M85,100 L93,74" stroke="#cfc6b0" stroke-width=".6"/>`;
+  s+=`<rect width="100" height="100" fill="${u('v')}"/></svg>`;
+  return PCACHE[key]=s;
 }
 function pickPhoto(id){
   const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
@@ -542,8 +628,8 @@ function showSelect(){
     const d=i<3?'<span class="diff d1">쉬움</span>':i<7?'<span class="diff d2">보통</span>':'<span class="diff d3">어려움</span>';
     const [c,r,home]=FORCES[x.f];
     return `<button class="fcard" onclick="newGame('${x.f}')"><div class="face r5" style="--c:${c}">${portrait(r,c)}</div>
-      <div class="fi"><b>${x.f}군</b> ${d}${x.f==='유비'?' <span class="diff d2">인재 수집 추천</span>':''}
-      <div>본거지 ${home} · 도시 ${x.cities} · 장수 ${x.gens} · 병력 ${fmt(x.troops)}</div></div></button>`;}).join('')}</div>
+      <div class="fi"><b style="color:${c}">${x.f}</b> ${d}
+      <div>🏯${home}${x.f==='유비'?' <span style="color:var(--gold)">★추천</span>':''}<br>성${x.cities} · 장수${x.gens} · ${(x.troops/1000).toFixed(0)}k</div></div></button>`;}).join('')}</div>
   <button class="btn" style="max-width:520px" onclick="showTitle()">뒤로</button>`;
 }
 
@@ -556,7 +642,7 @@ function render(){
     <div class="res"><span>💰${fmt(F.gold)}</span><span>🌾${fmt(F.food)}</span><span>📜${S.dex.length}/${TOTAL}</span></div>`;
   document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===UI.tab));
   const v=$('#view');
-  if(UI.tab==='map')v.innerHTML=mapSVG()+`<div class="pan">${cityPanel()}</div>`;
+  if(UI.tab==='map')v.innerHTML=mapSVG()+lordsRow()+tipBar()+`<div class="pan">${cityPanel()}</div>`;
   else if(UI.tab==='gens')v.innerHTML=gensTab();
   else if(UI.tab==='dex')v.innerHTML=dexTab();
   else v.innerHTML=menuTab();
@@ -568,21 +654,29 @@ function mapSVG(){
   <text x="322" y="104" font-size="8" fill="#6f9cbf" text-anchor="end">황하</text>
   <text x="328" y="232" font-size="8" fill="#6f9cbf" text-anchor="end">장강</text>`;
   EDGES.forEach(([a,b])=>{const A=S.cities[a],B=S.cities[b];s+=`<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="#6b5538" stroke-width="1.5" stroke-dasharray="3 3"/>`;});
+  let o='';
+  const P=(x,y)=>`left:${(x/340*100).toFixed(2)}%;top:${(y/338*100).toFixed(2)}%`;
   Object.values(S.cities).forEach(c=>{
     const col=c.owner?S.forces[c.owner].color:'#5a4a38';const mine=c.owner===S.player;
     const idle=mine?idleIn(c.id).length:0;
     const talent=gensAt(c.id,'free').length+gensAt(c.id,'prisoner').length;
     s+=`<g onclick="selCity('${c.id}')">`;
-    if(UI.sel===c.id)s+=`<circle cx="${c.x}" cy="${c.y}" r="16" class="ring"/>`;
+    if(UI.hl&&c.owner===UI.hl)s+=`<circle cx="${c.x}" cy="${c.y}" r="19" fill="${col}" opacity=".35"/>`;
+    if(UI.sel===c.id)s+=`<circle cx="${c.x}" cy="${c.y}" r="17" class="ring"/>`;
     s+=`<circle cx="${c.x}" cy="${c.y}" r="18" fill="transparent"/>`;
     s+=`<circle cx="${c.x}" cy="${c.y}" r="${mine?11:9}" fill="${col}" stroke="${mine?'#ffe39a':'#140e08'}" stroke-width="2"/>`;
-    s+=`<text x="${c.x}" y="${c.y+21}" class="cn">${c.id}</text>`;
-    s+=`<text x="${c.x}" y="${c.y+30}" class="cnt">${(c.troops/1000).toFixed(1)}k</text>`;
-    if(idle)s+=`<circle cx="${c.x+10}" cy="${c.y-9}" r="6" fill="#e8604e"/><text x="${c.x+10}" y="${c.y-6}" class="bd">${idle}</text>`;
-    if(talent)s+=`<text x="${c.x-11}" y="${c.y-6}" font-size="11" fill="#ffd166" text-anchor="middle" style="pointer-events:none">★</text>`;
+    s+=`<text x="${c.x}" y="${c.y+22}" class="cn">${c.id}</text>`;
+    s+=`<text x="${c.x}" y="${c.y+31}" class="cnt">${(c.troops/1000).toFixed(1)}k</text>`;
     s+='</g>';
+    if(idle)o+=`<div class="mbadge" style="${P(c.x+12,c.y-10)}">${idle}</div>`;
+    if(talent)o+=`<div class="mstar" style="${P(c.x-13,c.y-10)}">★</div>`;
   });
-  return s+'</svg>';
+  // 군주가 있는 도시에 군주 얼굴
+  Object.values(S.forces).filter(f=>f.alive).forEach(f=>{
+    const r=S.gens[f.ruler];if(!r||r.status!=='serve'||r.force!==f.name||!S.cities[r.city])return;
+    const c=S.cities[r.city];o+=`<div class="rmark" style="${P(c.x,c.y)}">${face(r)}<i>👑</i></div>`;
+  });
+  return `<div class="mapwrap">${s}</svg>${o}</div>`;
 }
 function selCity(id){UI.sel=id;render();}
 function cityPanel(){
@@ -650,7 +744,7 @@ function dexTab(){
 }
 function menuTab(){
   const rows=Object.values(S.forces).filter(f=>f.alive).map(f=>{const cs=citiesOf(f.name);
-    return `<tr><td style="text-align:left"><span class="dot" style="background:${f.color}"></span>${f.name}</td><td>${cs.length}</td><td>${G().filter(g=>g.force===f.name&&g.status==='serve').length}</td><td>${fmt(sum(cs,c=>c.troops))}</td></tr>`;}).join('');
+    return `<tr onclick="lordInfo('${f.name}')"><td style="text-align:left;display:flex;align-items:center;gap:6px">${face(S.gens[f.ruler],'sm')}<b style="color:${f.color}">${f.name}</b></td><td>${cs.length}</td><td>${G().filter(g=>g.force===f.name&&g.status==='serve').length}</td><td>${fmt(sum(cs,c=>c.troops))}</td></tr>`;}).join('');
   const dead=Object.values(S.forces).filter(f=>!f.alive).map(f=>f.name).join(', ');
   return `<div class="pan"><div class="sec"><span>세력 현황</span><span>${S.year}년 ${S.month}월</span></div>
   <table class="tbl"><tr><th style="text-align:left">세력</th><th>도시</th><th>장수</th><th>병력</th></tr>${rows}</table>
@@ -1004,6 +1098,99 @@ function autoAll(){
     <button class="btn pri" onclick="closeModal()">확인</button>`);
 }
 
+/* ===================== 참모(군사) ===================== */
+function advisor(){
+  let a=S.advisor&&S.gens[S.advisor];
+  if(!S.advisorPinned||!a||a.status!=='serve'||a.force!==S.player){a=myGens().sort((x,y)=>y.int-x.int)[0];S.advisor=a?a.id:null;S.advisorPinned=false;}
+  return a||null;
+}
+function adviceList(){
+  const a=advisor();if(!a)return [];
+  const L=[],seen=new Set(),sharp=a.int>=90,good=a.int>=75;
+  const push=(pri,icon,text,city)=>{if(!seen.has(text)){seen.add(text);L.push({pri,icon,text,city});}};
+  const mine=citiesOf(S.player),F=S.forces[S.player];
+  if(S.turn<8)push(45,'🕊️',`적들은 앞으로 ${8-S.turn}개월 정도는 우리를 치지 않을 것입니다. 지금 인재를 모으고 힘을 기르십시오.`);
+  // 위협
+  const threat=new Set();
+  mine.forEach(c=>ADJ[c.id].forEach(n=>{
+    const t=S.cities[n];if(!t.owner||t.owner===S.player||threat.has(c.id))return;
+    const gs=gensAt(n,'serve',t.owner);if(!gs.length)return;
+    const army=gs.slice().sort((x,y)=>power([y])-power([x])).slice(0,3);
+    const r=(t.troops*.75*power(army))/((c.troops+1)*1.15*power(gensAt(c.id,'serve',S.player)));
+    if(r>(good?1.3:1.8)&&S.turn>=5){threat.add(c.id);
+      push(95,'⚠️',`${t.owner}군(${n})이 ${j(c.id,'을','를')} 노리고 있습니다${sharp?` (적 ${fmt(t.troops)} vs 아군 ${fmt(c.troops)})`:''}. 징병하거나 병력을 옮겨 대비하십시오.`,c.id);}
+  }));
+  mine.forEach(c=>{if(!gensAt(c.id,'serve',S.player).length)push(80,'🏯',`${c.id}에 장수가 한 명도 없습니다. 장수를 보내 지키게 하십시오.`,c.id);});
+  // 등용 대상
+  mine.forEach(c=>{const idle=idleIn(c.id);
+    [...gensAt(c.id,'free'),...gensAt(c.id,'prisoner')].forEach(t=>{
+      const best=idle.length?Math.max(...idle.map(g=>recruitChance(g,t))):0,pc=Math.round(best*100);
+      if(t.status==='free')push(90,'🤝',`${c.id}에 재야의 ${t.name}(${stars(rarity(t))})이 있습니다. ${idle.length?`지금 등용하십시오 (성공 ${pc}%)`:'다음 달에 꼭 등용하십시오'}.`,c.id);
+      else push(best>=.3?86:58,'⛓️',`감옥의 ${t.name}: 충성 ${t.loy}${idle.length?` · 설득 성공 ${pc}%`:''}. ${best>=.3?'지금 설득해 볼 만합니다.':'조금 더 가둬 두면 마음이 약해질 것입니다.'}${sharp&&t.war+t.int>=150?' 재주가 뛰어나 탈옥에 주의하십시오.':''}`,c.id);
+    });
+  });
+  // 숨은 인재
+  mine.forEach(c=>{const h=gensAt(c.id,'hidden');if(!h.length)return;const mr=Math.max(...h.map(rarity));
+    push(76,'🔍',`${c.id}에 숨은 인재의 소문이 있습니다${good&&mr>=4?` — ${sharp?stars(mr)+' ':''}범상치 않은 인물인 듯합니다`:''}. 탐색하십시오.`,c.id);});
+  // 공격 기회
+  mine.forEach(c=>{const idle=idleIn(c.id);if(!idle.length||c.troops<4000)return;
+    const A=idle.slice().sort((x,y)=>power([y])-power([x])).slice(0,3);
+    ADJ[c.id].forEach(n=>{const t=S.cities[n];if(t.owner===S.player)return;const D=t.owner?gensAt(n,'serve',t.owner):[];
+      const r=(c.troops*.8*power(A))/((t.troops||1)*1.15*power(D)+1);
+      if(r<=(good?1.3:1.7))return;
+      const fr=gensAt(n,'free'),hid=gensAt(n,'hidden').length;
+      const extra=fr.length?` 그곳엔 재야의 ${fr.map(g=>g.name).join('·')}도 있습니다!`:hid&&good?` 점령하면 숨은 인재${sharp?' '+hid+'명':''}을 찾을 수 있을 것입니다.`:'';
+      push(68+(fr.length?18:0)+(hid?4:0),'⚔️',`${c.id}에서 ${t.owner?t.owner+'군의 ':'공백지 '}${j(n,'을','를')} 치십시오. 승산이 ${r>1.7?'충분합':'있습'}니다.${extra}`,c.id);
+    });
+  });
+  // 남의 땅의 재야 명장
+  if(good)Object.values(S.cities).filter(c=>c.owner!==S.player).forEach(c=>gensAt(c.id,'free').filter(g=>rarity(g)>=4).forEach(g=>
+    push(55,'👀',`${c.owner?c.owner+'군의 ':'공백지 '}${c.id}에 재야의 ${g.name}(${stars(rarity(g))})이 있습니다. 남이 데려가기 전에 그 땅을 노려 보십시오.`,c.id)));
+  // 경제
+  const net=sum(mine,c=>c.agri)*.6-sum(mine,c=>c.troops)*.02;
+  if(net<0&&F.food/(-net)<6)push(88,'🌾',`식량이 약 ${Math.max(0,Math.floor(F.food/(-net)))}개월분밖에 없습니다. 농업을 개발하십시오.${S.month<9?` (가을 수확까지 ${9-S.month}개월)`:''}`);
+  if(F.gold>=1500)push(50,'💰',`금이 ${fmt(F.gold)} 쌓여 있습니다. 징병과 개발에 쓰십시오.`);
+  else if(F.gold<100)push(62,'💰','금이 바닥났습니다. 상업 개발을 서두르십시오.');
+  const idleN=myGens().filter(g=>!g.acted).length;
+  if(idleN)push(35,'⏳',`아직 쉬는 장수가 ${idleN}명 있습니다. 바쁘시면 ⚡자동 내정을 쓰십시오.`);
+  if(sharp){const st=Object.values(S.forces).filter(f=>f.alive&&f.name!==S.player).map(f=>({f:f.name,p:sum(citiesOf(f.name),c=>c.troops)})).sort((x,y)=>y.p-x.p)[0];
+    if(st)push(30,'🗺️',`지금 가장 강한 적은 ${st.f}군입니다 (총병력 ${fmt(st.p)}). 정면으로 맞서기보다 약한 곳부터 치십시오.`);}
+  if(!L.length)push(10,'🍵','지금은 특별히 걱정할 일이 없습니다. 내정에 힘쓰십시오.');
+  return L.sort((x,y)=>y.pri-x.pri).slice(0,a.int>=90?8:a.int>=75?5:3);
+}
+function tipBar(){
+  const a=advisor();if(!a)return '';const t=adviceList()[0];if(!t)return '';
+  return `<div class="tip" onclick="openAdvisor()">${face(a)}<div><b>${a.name}</b> ${t.icon} ${t.text}</div></div>`;
+}
+function openAdvisor(){
+  const a=advisor();if(!a)return toast('참모를 맡을 장수가 없습니다');
+  const q=a.int>=90?'신산귀모 — 정확하고 많은 조언':a.int>=75?'쓸 만한 책사 — 조언 5가지':'조언이 서툼 — 지력 높은 장수로 바꾸세요';
+  const list=adviceList();
+  openModal(`<div class="advh">${face(a,'big')}<div><div class="sub" style="margin:0">군사(참모)</div><h3>${a.name} <span class="st r${rarity(a)}">${stars(rarity(a))}</span></h3><div style="font-size:13px">지력 ${a.int} · ${q}</div></div></div>
+    <div class="bubble">주공, ${S.year}년 ${S.month}월의 형세를 아뢰옵니다.</div>
+    ${list.map(x=>`<button class="adv ${x.pri>=85?'hi':''}" onclick="advGo('${x.city||''}')"><i>${x.icon}</i><span>${x.text}${x.city?' <small style="color:var(--dim)">▶ 보기</small>':''}</span></button>`).join('')}
+    <div class="row2"><button class="btn" onclick="changeAdvisor()">🔄 참모 바꾸기</button><button class="btn pri" onclick="closeModal()">알겠소</button></div>`);
+}
+function advGo(c){closeModal();if(c){UI.sel=c;UI.tab='map';render();$('#view').scrollTop=0;}}
+function changeAdvisor(){
+  chooseGen(myGens().sort((x,y)=>y.int-x.int),'누구를 참모로 둘까?',g=>`지력 ${g.int} · ${g.int>=90?'조언 8가지':g.int>=75?'조언 5가지':'조언 3가지'}`,g=>{S.advisor=g.id;S.advisorPinned=true;save();openAdvisor();},'참모는 행동을 쓰지 않습니다. 지력이 높을수록 조언이 정확하고 많아요. (직접 고르지 않으면 지력이 가장 높은 장수가 자동으로 맡아요)');
+}
+function lordsRow(){
+  const fs=[S.player,...Object.keys(S.forces).filter(f=>f!==S.player&&S.forces[f].alive).sort((x,y)=>citiesOf(y).length-citiesOf(x).length)];
+  return `<div class="lords">${fs.map(f=>{const F=S.forces[f],r=S.gens[F.ruler];
+    return `<button class="lord ${UI.hl===f?'on':''}" onclick="lordInfo('${f}')">${face(r,'sm')}<span><b style="color:${F.color}">${f}${f===S.player?' (나)':''}</b><small>도시 ${citiesOf(f).length} · 병력 ${(sum(citiesOf(f),c=>c.troops)/1000).toFixed(0)}k</small></span></button>`;}).join('')}</div>`;
+}
+function lordInfo(f){
+  const F=S.forces[f],r=S.gens[F.ruler],cs=citiesOf(f),gs=G().filter(g=>g.force===f&&g.status==='serve');
+  openModal(`<div class="advh">${face(r,'big')}<div><div class="sub" style="margin:0">군주</div><h3 style="color:${F.color}">${r.name}</h3><div style="font-size:13px">${f}군${f===S.player?' (나)':''}${r.status!=='serve'?' · 군주가 붙잡혀 있음':''}</div></div></div>
+    <div class="stats"><div>도시<b>${cs.length}</b></div><div>장수<b>${gs.length}</b></div><div>병력<b>${fmt(sum(cs,c=>c.troops))}</b></div></div>
+    <div class="sec"><span>영토 (누르면 지도로)</span></div>
+    ${cs.map(c=>`<button class="citybtn" onclick="UI.hl='${f}';closeModal();UI.tab='map';selCity('${c.id}')"><b>${c.id}</b><small>병력 ${fmt(c.troops)} · 장수 ${gensAt(c.id,'serve',f).length}</small></button>`).join('')}
+    <div class="sec"><span>주요 장수</span><span>${gs.length}명</span></div>
+    ${gs.sort((x,y)=>rarity(y)-rarity(x)||total(y)-total(x)).slice(0,5).map(g=>card(g,`📍 ${g.city}${isRuler(g)?' · 👑':''}`,`showGen('${g.id}')`)).join('')}
+    <button class="btn" onclick="UI.hl=${UI.hl===f?'null':`'${f}'`};closeModal();render()">${UI.hl===f?'지도 표시 끄기':'🗺️ 지도에 영토 표시'}</button><button class="btn" onclick="closeModal()">닫기</button>`);
+}
+
 /* ===================== 턴 종료 / AI ===================== */
 function endTurn(){
   if(!S)return;
@@ -1021,7 +1208,7 @@ function endTurn(){
   const showNews=()=>{
     if(!news.length)return toast(`📅 ${S.year}년 ${S.month}월 · 금 +${fmt(inc.g)} · 식량 ${inc.f>=0?'+':''}${fmt(inc.f)}`);
     openModal(`<h3>📜 ${S.year}년 ${S.month}월 소식</h3><div class="sub">금 +${fmt(inc.g)} · 식량 ${inc.f>=0?'+':''}${fmt(inc.f)}</div>
-      <div class="blog">${news.map(([t,c])=>`<div class="${c||''}">${t}</div>`).join('')}</div><button class="btn pri" onclick="closeModal()">확인</button>`);
+      <div class="blog">${news.map(([t,c])=>`<div class="${c||''}">${t}</div>`).join('')}</div>${tipBar().replace('class="tip"','class="tip" style="margin:10px 0 0"').replace('onclick="openAdvisor()"','onclick="closeModal();openAdvisor()"')}<button class="btn pri" onclick="closeModal()">확인</button>`);
   };
   const playNext=()=>{const b=battles.shift();if(b)playBattle(b,playNext);else showNews();};
   playNext();
@@ -1090,6 +1277,7 @@ function openHelp(first){
   <p>🔍 <b>탐색</b>으로 숨은 인재를 찾고 🤝 <b>등용</b>하세요. 실패해도 다시 찾아가면 확률이 올라가요(삼고초려). 군주를 <b>흠모</b>하는 인재는 훨씬 쉽게 와요.</p>
   <p>⭐ 다른 도시의 숨은 인재는 그 도시를 <b>점령</b>해야 찾을 수 있어요. AI도 인재를 데려가니 서두르세요!</p>
   <p>⛓️ 싸워 이기면 적 장수를 <b>포로</b>로 잡아 그 자리에서 설득할 수 있어요. 충성심이 높아 거절하면 <b>감옥</b>에 가둬요. 감옥에 있는 동안 충성심이 떨어지니 매달 다시 설득하세요. 단, <b>탈옥</b>할 수도 있어요! 풀어 주면 은혜를 기억해서 나중에 등용하기 쉬워져요.</p>
+  <p>💬 <b>참모</b>: 지력이 가장 높은 장수가 군사가 되어 위험·공격 기회·등용할 인재를 알려 줘요. 지도 아래 한 줄 조언을 누르면 전체 조언을 볼 수 있어요. 지도 아래 <b>군주 목록</b>을 누르면 각 세력의 영토와 장수를 볼 수 있어요.</p>
   <p>📷 도감에서 장수를 눌러 <b>내 사진</b>으로 초상화를 바꿀 수 있어요. 💾 메뉴에서 저장 슬롯 3개와 백업 파일을 쓸 수 있어요.</p>
   <p>⚡ <b>바쁠 땐 자동 내정 → 턴 종료</b>. 한 달이 10초면 끝나요. 모든 행동은 자동 저장됩니다.</p>
   <p>🛡️ 처음 몇 달은 적이 공격해 오지 않아요. 그동안 인재를 모으고 병력을 키우세요.</p></div>
