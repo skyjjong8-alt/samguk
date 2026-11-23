@@ -1,5 +1,5 @@
 // 천하쟁패 — 오프라인에서도 게임이 켜지도록 앱 파일을 캐시합니다. 저장 데이터는 휴대폰(localStorage)에 있습니다.
-const CACHE = 'chunha-v1';
+const CACHE = 'chunha-v2';
 const SHELL = [
   './',
   './index.html',
