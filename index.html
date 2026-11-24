@@ -82,8 +82,16 @@ b{font-weight:700}
 .capb{display:flex;gap:6px;margin:-2px 0 10px}
 .capb .btn{height:40px;margin-top:0;font-size:14px}
 .capr{text-align:center;font-weight:800;padding:8px;border-radius:10px;margin:-2px 0 10px;background:var(--panel)}
-.mapwrap{position:relative;width:min(100%,calc(52vh * 340 / 338));aspect-ratio:340/338;margin:0 auto}
+.mapouter{position:relative}
+.map .mvok{fill:#7ee07e33;stroke:#7ee07e;stroke-width:3;animation:pulse 1s ease-in-out infinite}
+.mvbar{position:absolute;left:8px;right:54px;bottom:8px;z-index:6;background:#0b2a10ee;border:1px solid #7ee07e;color:#fff;border-radius:12px;padding:8px 10px;font-size:13px;display:flex;align-items:center;gap:6px;line-height:1.35}
+.mvbar button{margin-left:auto;flex:none;background:#fff;color:#111;border-radius:8px;padding:6px 10px;font-weight:800;font-size:13px}
+.mapbox{height:47vh;overflow:auto;-webkit-overflow-scrolling:touch;background:#1f1710;overscroll-behavior:contain;scrollbar-width:none}
+.mapbox::-webkit-scrollbar{display:none}
+.mapwrap{position:relative;aspect-ratio:600/610}
 .mapwrap .map{width:100%;height:100%;max-height:none}
+.zbar{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:6px;z-index:5}
+.zbar button{width:38px;height:38px;border-radius:10px;background:#000b;color:#fff;font-size:18px;font-weight:800;border:1px solid #fff3}
 .rmark{position:absolute;transform:translate(-50%,-50%);pointer-events:none;z-index:1}
 .rmark .face{width:27px;height:27px;border-width:2px;box-shadow:0 0 0 1.5px #ffe39a,0 2px 6px #000a}
 .rmark i{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:11px;font-style:normal}
@@ -205,134 +213,22 @@ input[type=range]{width:100%;accent-color:var(--gold);height:30px}
 <div id="toast"></div>
 <div id="title"></div>
 
+<script src="data.js"></script>
 <script>
 /* ===================== 데이터 ===================== */
-const FORCES={
-  '조조':['#3b82f6','조조','허창'],
-  '원소':['#eab308','원소','업'],
-  '공손찬':['#94a3b8','공손찬','북평'],
-  '유비':['#22c55e','유비','하비'],
-  '손책':['#ef4444','손책','건업'],
-  '원술':['#a855f7','원술','수춘'],
-  '유표':['#14b8a6','유표','양양'],
-  '유장':['#b45309','유장','성도'],
-  '장로':['#fb923c','장로','한중'],
-  '이각':['#64748b','이각','장안']
-};
-// 이름: [x, y, 소유, 병력, 농업, 상업]
-const CITIES={
-  '북평':[300,32,'공손찬',6000,300,250],
-  '남피':[262,74,'원소',6000,400,350],
-  '업':[212,92,'원소',9000,500,450],
-  '진류':[236,140,'조조',5000,400,350],
-  '허창':[206,180,'조조',6000,450,400],
-  '낙양':[152,134,null,3000,250,250],
-  '장안':[84,128,'이각',7000,400,350],
-  '한중':[62,190,'장로',5000,350,250],
-  '성도':[34,256,'유장',7000,550,400],
-  '신야':[150,198,null,3000,250,200],
-  '양양':[170,250,'유표',8000,500,450],
-  '강릉':[116,282,'유표',4000,450,300],
-  '강하':[216,258,'유표',4000,350,300],
-  '장사':[178,302,null,3000,350,250],
-  '수춘':[266,204,'원술',8000,450,450],
-  '건업':[308,250,'손책',6000,450,400],
-  '하비':[300,152,'유비',4000,350,300]
-};
-const EDGES=[['북평','남피'],['남피','업'],['남피','하비'],['업','진류'],['업','낙양'],['진류','허창'],['진류','하비'],['낙양','장안'],['낙양','허창'],['장안','한중'],['한중','성도'],['성도','강릉'],['허창','신야'],['허창','수춘'],['신야','양양'],['양양','강릉'],['양양','강하'],['강릉','장사'],['강하','장사'],['강하','건업'],['강하','수춘'],['수춘','건업'],['수춘','하비']];
-// 이름,무력,지력,통솔,매력,세력(-:없음),도시,상태(s:소속 h:숨음 f:재야)
-const GENS=`조조,72,91,96,96,조조,허창,s
-하후돈,90,58,86,70,조조,진류,s
-하후연,91,54,84,68,조조,허창,s
-조인,84,60,88,72,조조,진류,s
-전위,97,35,64,52,조조,허창,s
-순욱,14,95,52,90,조조,허창,s
-곽가,15,97,60,82,조조,진류,s
-악진,84,50,76,60,조조,진류,s
-이전,78,70,78,62,조조,허창,s
-허저,96,36,66,62,-,허창,h
-순유,20,94,60,72,-,진류,h
-원소,68,70,80,92,원소,업,s
-안량,93,42,76,50,원소,업,s
-문추,94,30,74,48,원소,남피,s
-전풍,28,93,62,62,원소,업,s
-저수,36,92,78,70,원소,남피,s
-심배,52,78,70,58,원소,업,s
-장합,90,68,86,64,원소,남피,s
-고람,84,48,76,56,원소,업,s
-사마의,63,96,98,85,-,업,h
-공손찬,84,56,82,72,공손찬,북평,s
-공손속,60,50,60,55,공손찬,북평,s
-엄강,70,40,60,40,공손찬,북평,s
-조운,96,76,91,85,-,북평,h
-전예,76,82,84,74,-,북평,h
-유비,73,74,78,99,유비,하비,s
-관우,97,75,95,93,유비,하비,s
-장비,98,30,85,45,유비,하비,s
-간옹,30,72,40,78,유비,하비,s
-미축,28,70,40,82,유비,하비,s
-손건,32,74,40,80,유비,하비,s
-진등,50,86,70,70,-,하비,h
-손책,94,68,92,92,손책,건업,s
-주유,70,96,96,92,손책,건업,s
-정보,76,74,82,72,손책,건업,s
-황개,82,64,80,70,손책,건업,s
-한당,78,48,72,58,손책,건업,s
-태사자,93,66,80,74,손책,건업,s
-장소,20,90,40,80,손책,건업,s
-손권,66,80,76,95,손책,건업,s
-육손,68,95,94,84,-,건업,h
-여몽,82,88,90,76,-,건업,h
-원술,60,58,62,40,원술,수춘,s
-기령,82,42,70,40,원술,수춘,s
-장훈,70,52,66,48,원술,수춘,s
-교유,60,40,58,40,원술,수춘,s
-염상,30,78,40,50,원술,수춘,s
-노숙,54,92,82,88,-,수춘,h
-유표,44,74,60,86,유표,양양,s
-채모,68,70,72,40,유표,양양,s
-괴월,30,86,48,72,유표,양양,s
-문빙,82,60,80,68,유표,강릉,s
-황조,64,50,66,40,유표,강하,s
-감녕,94,60,82,58,유표,강하,s
-제갈량,38,100,92,94,-,양양,h
-방통,34,97,82,70,-,양양,h
-마량,30,85,50,82,-,강릉,h
-서서,64,92,80,80,-,신야,h
-등애,88,92,92,64,-,신야,h
-황충,95,62,88,70,-,장사,h
-위연,92,58,80,40,-,장사,h
-유장,28,50,36,62,유장,성도,s
-장임,84,74,86,70,유장,성도,s
-엄안,84,66,80,72,유장,성도,s
-법정,40,94,72,60,유장,성도,s
-황권,40,82,72,72,유장,성도,s
-장로,30,72,52,80,장로,한중,s
-염포,28,80,40,70,장로,한중,s
-양앙,70,30,60,30,장로,한중,s
-양임,76,40,66,40,장로,한중,s
-강유,90,92,92,80,-,한중,h
-이각,78,30,70,22,이각,장안,s
-곽사,76,28,66,20,이각,장안,s
-가후,45,97,80,58,이각,장안,s
-번조,72,25,60,20,이각,장안,s
-마초,97,44,88,82,-,장안,h
-방덕,94,68,82,70,-,장안,h
-마대,80,54,72,60,-,장안,h
-여포,100,26,90,30,-,낙양,f
-진궁,54,92,74,70,-,낙양,h
-장료,92,78,92,80,-,낙양,h
-고순,86,50,82,60,-,낙양,h
-서황,90,74,86,66,-,낙양,h`;
+/* 게임 데이터(지도·장수·시나리오)는 data.js 에 있습니다 */
 const TITLES={조조:'난세의 간웅',유비:'인덕의 군주',관우:'미염공',장비:'연인 장익덕',조운:'상산의 조자룡',제갈량:'와룡',방통:'봉추',여포:'비장',마초:'금마초',황충:'노익장',주유:'미주랑',손책:'소패왕',전위:'고대의 악래',허저:'호치',사마의:'총달',곽가:'귀재',장료:'요래래',감녕:'금범적',순욱:'왕좌지재',가후:'독사',육손:'서생 대도독',강유:'기린아',서서:'단복',손권:'벽안아',태사자:'신의의 사',노숙:'동오의 기둥',서황:'주아부의 기풍',등애:'말더듬이 명장',하후돈:'맹하후'};
 // 흠모하는 군주 (그 군주로 플레이하면 등용이 쉬워짐)
-const FAV={조운:'유비',제갈량:'유비',방통:'유비',서서:'유비',마초:'유비',황충:'유비',위연:'유비',마량:'유비',진등:'유비',
-  허저:'조조',순유:'조조',사마의:'조조',장료:'조조',서황:'조조',전예:'조조',
-  육손:'손책',여몽:'손책',노숙:'손책',감녕:'손책',
+const FAV={조운:'유비',제갈량:'유비',방통:'유비',서서:'유비',마초:'유비',황충:'유비',위연:'유비',마량:'유비',진등:'유비',법정:'유비',황권:'유비',강유:'유비',
+  허저:'조조',순유:'조조',사마의:'조조',장료:'조조',서황:'조조',전예:'조조',곽가:'조조',순욱:'조조',가후:'조조',장합:'조조',
+  육손:'손책·손권',여몽:'손책·손권',노숙:'손책·손권',감녕:'손책·손권',주유:'손책',태사자:'손책',주태:'손책·손권',
   고순:'여포',진궁:'여포'};
-const TOTAL=GENS.split('\n').length;
-const BASE={};GENS.split('\n').forEach(l=>{const a=l.trim().split(',');BASE[a[0]]={war:+a[1],int:+a[2],lead:+a[3],cha:+a[4]};});
-const RULERS=new Set(Object.values(FORCES).map(f=>f[1]));
+function favOf(n){return FAV[n]?FAV[n].split('·').filter(Boolean):[];}
+const BASE={};
+GDB.split('\n').forEach(l=>{const a=l.trim().split(',');if(a.length<8)return;BASE[a[0]]={name:a[0],war:+a[1],int:+a[2],lead:+a[3],cha:+a[4],from:+a[5],to:+a[6],home:a[7]};});
+const RULERS=new Set();SCEN.forEach(s=>Object.values(s.forces).forEach(f=>RULERS.add(f[1])));
+const SAVE_VER=2;
+function TOT(){return S?Object.keys(S.gens).length:Object.keys(BASE).length;}
 // 충성심 (포로가 됐을 때 등용 난이도). 없으면 55~84 사이 자동
 const LOY={관우:100,장비:100,간옹:95,미축:95,손건:92,하후돈:100,하후연:98,조인:98,전위:96,순욱:85,곽가:90,악진:90,이전:88,
   주유:98,정보:96,황개:96,한당:92,손권:100,태사자:88,장소:88,안량:90,문추:90,전풍:92,저수:92,심배:96,고람:75,장합:70,
@@ -547,28 +443,43 @@ function openModal(h){const m=$('#modal');m.innerHTML=`<div class="sheet">${h}</
 function closeModal(){$('#modal').classList.remove('on');UI.lock=false;}
 
 /* ===================== 새 게임 ===================== */
-function newGame(pf){
-  S={year:196,month:1,turn:0,player:pf,forces:{},cities:{},gens:{},dex:[]};
-  for(const k in FORCES){const [color,ruler]=FORCES[k];S.forces[k]={name:k,color,ruler,alive:true,gold:k===pf?1500:1000,food:8000};}
-  for(const k in CITIES){const [x,y,o,t,a,c]=CITIES[k];S.cities[k]={id:k,x,y,owner:o,troops:t,agri:a,comm:c};}
-  GENS.split('\n').forEach(line=>{const [n,w,i,l,ch,f,c,st]=line.trim().split(',');
-    S.gens[n]={id:n,name:n,war:+w,int:+i,lead:+l,cha:+ch,force:f==='-'?null:f,city:c,status:{s:'serve',h:'hidden',f:'free'}[st],acted:false,visits:0,prev:null,loy:defLoy(n),jail:0};});
+// 시나리오 배치: 소속 장수는 지정 도시(없으면 본거지·영토에 고르게), 나머지 살아 있는 인물은 고향에 숨은 인재
+function scenLayout(sc){
+  const gens={},owner={};
+  for(const f in sc.forces){const [,ruler,cs,list]=sc.forces[f];cs.forEach(c=>owner[c]=f);
+    let k=0;list.forEach(e=>{const [n,at]=e.split('@');if(!BASE[n])return;
+      const city=at&&cs.includes(at)?at:n===ruler?cs[0]:cs[(k++)%Math.min(cs.length,Math.max(1,Math.ceil(list.length/3)))];
+      gens[n]={force:f,city};});}
+  for(const n in BASE){if(gens[n])continue;const b=BASE[n];
+    if(b.to<=sc.year)continue;
+    gens[n]={force:null,city:b.home,status:b.from<=sc.year?'hidden':'unborn'};}
+  return {gens,owner};
+}
+function newGame(sid,pf){
+  const sc=SCEN.find(x=>x.id===sid),L=scenLayout(sc);
+  S={ver:SAVE_VER,scen:sid,year:sc.year,month:1,turn:0,player:pf,forces:{},cities:{},gens:{},dex:[]};
+  for(const k in sc.forces){const [color,ruler,cs]=sc.forces[k];S.forces[k]={name:k,color,ruler,home:cs[0],alive:true,gold:k===pf?1500:1000,food:8000};}
+  for(const n in L.gens){const b=BASE[n],x=L.gens[n];
+    S.gens[n]={id:n,name:n,war:b.war,int:b.int,lead:b.lead,cha:b.cha,force:x.force,city:x.city,status:x.force?'serve':x.status,debut:b.from,acted:false,visits:0,prev:null,loy:defLoy(n),jail:0};}
+  for(const k in CITY){const [x,y,a,c]=CITY[k],o=L.owner[k]||null;
+    const ng=o?Object.values(S.gens).filter(g=>g.city===k&&g.force===o).length:0;
+    S.cities[k]={id:k,x,y,owner:o,troops:o?(o&&S.forces[o].home===k?7000:3500)+ng*600:2000,agri:a,comm:c};}
   myGens().forEach(g=>S.dex.push(g.id));
-  UI.sel=FORCES[pf][2];UI.tab='map';
+  UI.sel=S.forces[pf].home;UI.tab='map';UI.center=true;UI.hl=null;
   $('#title').classList.remove('on');
   save();render();
   setTimeout(()=>openHelp(true),250);
 }
-function forceInfo(f){
-  const gs=GENS.split('\n').map(l=>l.split(',')).filter(a=>a[5]===f);
-  const cs=Object.values(CITIES).filter(c=>c[2]===f);
-  return {gens:gs.length,cities:cs.length,troops:sum(cs,c=>c[3]),score:sum(gs,a=>+a[1]+ +a[2]+ +a[3]+ +a[4])+sum(cs,c=>c[3])/30};
+function homeCity(){const h=S.forces[S.player]&&S.forces[S.player].home;if(h&&S.cities[h]&&S.cities[h].owner===S.player)return h;const c=citiesOf(S.player)[0];return c?c.id:h;}
+function forceInfo(sc,f){
+  const [,,cs,list]=sc.forces[f];const gs=list.map(e=>BASE[e.split('@')[0]]).filter(Boolean);
+  return {gens:gs.length,cities:cs.length,score:sum(gs,b=>b.war+b.int+b.lead+b.cha)+cs.length*150};
 }
-function showTitle(){
+function showTitle(msg){
   const has=!!loadSave();
   const t=$('#title');t.classList.add('on');
-  t.innerHTML=`<h1>天下爭霸</h1><p>천하쟁패 · 나만의 삼국지</p>
-    <button class="btn pri" onclick="showSelect()">새 게임</button>
+  t.innerHTML=`<h1>天下爭霸</h1><p>천하쟁패 · 나만의 삼국지</p>${msg?`<div class="sub" style="max-width:320px;text-align:center;color:var(--gold)">${msg}</div>`:''}
+    <button class="btn pri" onclick="showScen()">새 게임</button>
     ${has?'<button class="btn" onclick="continueGame()">이어하기</button>':''}
     <button class="btn" onclick="openSaves()">💾 불러오기</button>`;
 }
@@ -577,10 +488,11 @@ const SLOT=i=>'chunha_slot_'+i;
 function readSlot(i){try{const t=localStorage.getItem(SLOT(i));return t?JSON.parse(t):null;}catch(e){return null;}}
 function openSaves(){
   const rows=[1,2,3].map(i=>{const d=readSlot(i);
-    const info=d?`<b style="color:${(FORCES[d.player]?FORCES[d.player][0]:'var(--gold)')}">${d.player}군</b> · ${d.year}년 ${d.month}월 · 도감 ${d.dex.length}/${TOTAL}<br><span style="font-size:11px">${new Date(d.savedAt||0).toLocaleString('ko-KR')}</span>`:'비어 있음';
+    const old=d&&d.ver!==SAVE_VER;
+    const info=d?`<b style="color:${d.forces&&d.forces[d.player]?d.forces[d.player].color:'var(--gold)'}">${d.player}군</b> · ${d.year}년 ${d.month}월 · 도감 ${d.dex.length}/${Object.keys(d.gens).length}${old?' <span style="color:var(--red)">(예전 지도 — 불러올 수 없음)</span>':''}<br><span style="font-size:11px">${new Date(d.savedAt||0).toLocaleString('ko-KR')}</span>`:'비어 있음';
     return `<div class="slot"><div class="sl">슬롯 ${i} · ${info}</div><div class="row2">
       <button class="btn" onclick="saveSlot(${i})" ${S?'':'disabled'}>💾 저장</button>
-      <button class="btn pri" onclick="loadSlot(${i})" ${d?'':'disabled'}>📂 불러오기</button></div></div>`;}).join('');
+      <button class="btn pri" onclick="loadSlot(${i})" ${d&&!old?'':'disabled'}>📂 불러오기</button></div></div>`;}).join('');
   openModal(`<h3>💾 저장 / 불러오기</h3><div class="sub">지금 게임은 항상 자동 저장됩니다. 중요한 순간을 슬롯에 따로 남겨 두세요.</div>
     ${rows}
     <div class="sec"><span>백업 파일 (폰 교체·브라우저 초기화 대비)</span></div>
@@ -593,8 +505,9 @@ function saveSlot(i){
   openSaves();
 }
 function useLoaded(d){
+  if(d.ver!==SAVE_VER){toast('예전 지도(17개 도시)로 저장된 게임이라 불러올 수 없습니다');return;}
   delete d.savedAt;S=d;migrate();save();
-  UI.sel=FORCES[S.player][2];if(!S.cities[UI.sel]||S.cities[UI.sel].owner!==S.player){const c=citiesOf(S.player)[0];if(c)UI.sel=c.id;}
+  UI.sel=homeCity();UI.center=true;
   $('#title').classList.remove('on');closeModal();UI.tab='map';render();
 }
 function loadSlot(i){
@@ -619,50 +532,81 @@ function importSave(){
   inp.click();
 }
 function migrate(){G().forEach(g=>{if(g.loy===undefined)g.loy=defLoy(g.name);if(g.jail===undefined)g.jail=0;});}
-function continueGame(){S=loadSave();migrate();$('#title').classList.remove('on');if(!UI.sel)UI.sel=FORCES[S.player][2];render();}
-function showSelect(){
-  const list=Object.keys(FORCES).map(f=>({f,...forceInfo(f)})).sort((a,b)=>b.score-a.score);
+function continueGame(){const s=loadSave();if(!s||s.ver!==SAVE_VER)return showTitle('지도가 51개 도시로 바뀌어 예전 게임은 이어할 수 없어요. 새 게임을 시작해 주세요.');
+  S=s;migrate();$('#title').classList.remove('on');UI.sel=homeCity();UI.center=true;render();}
+function showScen(){
   const t=$('#title');
-  t.innerHTML=`<h3 style="margin:0 0 4px">군주를 선택하세요</h3><div style="color:var(--dim);font-size:13px;margin-bottom:12px">서기 196년 · 군웅할거</div>
-  <div class="fsel">${list.map((x,i)=>{
-    const d=i<3?'<span class="diff d1">쉬움</span>':i<7?'<span class="diff d2">보통</span>':'<span class="diff d3">어려움</span>';
-    const [c,r,home]=FORCES[x.f];
-    return `<button class="fcard" onclick="newGame('${x.f}')"><div class="face r5" style="--c:${c}">${portrait(r,c)}</div>
-      <div class="fi"><b style="color:${c}">${x.f}</b> ${d}
-      <div>🏯${home}${x.f==='유비'?' <span style="color:var(--gold)">★추천</span>':''}<br>성${x.cities} · 장수${x.gens} · ${(x.troops/1000).toFixed(0)}k</div></div></button>`;}).join('')}</div>
+  t.innerHTML=`<h3 style="margin:0 0 4px">시대를 선택하세요</h3><div style="color:var(--dim);font-size:13px;margin-bottom:12px">도시 51개 · 장수 ${Object.keys(BASE).length}명</div>
+  <div class="fsel" style="grid-template-columns:1fr">${SCEN.map(sc=>{
+    const n=Object.keys(sc.forces).length;
+    return `<button class="fcard" style="flex-direction:column;align-items:flex-start;gap:4px" onclick="showSelect('${sc.id}')">
+      <div><b style="font-size:17px;color:var(--gold)">${sc.year}년 · ${sc.title}</b> <span style="color:var(--dim);font-size:12px">${sc.sub}</span></div>
+      <div style="font-size:12.5px;color:var(--text);line-height:1.5">${sc.desc}</div>
+      <div style="display:flex;gap:3px;flex-wrap:wrap">${Object.entries(sc.forces).slice(0,12).map(([f,v])=>`<span class="diff" style="background:${v[0]};color:#111">${f}</span>`).join('')}${n>12?`<span class="diff" style="background:#444">외 ${n-12}</span>`:''}</div></button>`;}).join('')}</div>
   <button class="btn" style="max-width:520px" onclick="showTitle()">뒤로</button>`;
+}
+function showSelect(sid){
+  const sc=SCEN.find(x=>x.id===sid);
+  const list=Object.keys(sc.forces).map(f=>({f,...forceInfo(sc,f)})).sort((a,b)=>b.score-a.score);
+  const t=$('#title'),k=list.length;
+  t.innerHTML=`<h3 style="margin:0 0 4px">군주를 선택하세요</h3><div style="color:var(--dim);font-size:13px;margin-bottom:12px">${sc.year}년 · ${sc.title} · 세력 ${k}개</div>
+  <div class="fsel">${list.map((x,i)=>{
+    const d=i<k*.3?'<span class="diff d1">쉬움</span>':i<k*.65?'<span class="diff d2">보통</span>':'<span class="diff d3">어려움</span>';
+    const [c,r,cs]=sc.forces[x.f];
+    return `<button class="fcard" onclick="newGame('${sid}','${x.f}')"><div class="face r5" style="--c:${c}">${portrait(r,c)}</div>
+      <div class="fi"><b style="color:${c}">${x.f}</b> ${d}
+      <div>🏯${cs[0]}${x.f==='유비'?' <span style="color:var(--gold)">★추천</span>':''}<br>성${x.cities} · 장수${x.gens}</div></div></button>`;}).join('')}</div>
+  <button class="btn" style="max-width:520px" onclick="showScen()">뒤로</button>`;
 }
 
 /* ===================== 화면 ===================== */
-function tab(t){UI.tab=t;render();$('#view').scrollTop=0;}
+function tab(t){if(t!=='map')UI.mv=null;UI.tab=t;render();$('#view').scrollTop=0;}
 function render(){
   if(!S)return;
   const F=S.forces[S.player];
   $('#top').innerHTML=`<div><div class="date">${S.year}년 ${S.month}월</div><div class="fn" style="color:${F.color}">${S.player}군</div></div>
-    <div class="res"><span>💰${fmt(F.gold)}</span><span>🌾${fmt(F.food)}</span><span>📜${S.dex.length}/${TOTAL}</span></div>`;
+    <div class="res"><span>💰${fmt(F.gold)}</span><span>🌾${fmt(F.food)}</span><span>📜${S.dex.length}/${TOT()}</span></div>`;
   document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===UI.tab));
   const v=$('#view');
-  if(UI.tab==='map')v.innerHTML=mapSVG()+lordsRow()+tipBar()+`<div class="pan">${cityPanel()}</div>`;
+  const mb0=$('#mapbox'),keep=mb0?[mb0.scrollLeft,mb0.scrollTop]:null;
+  if(UI.tab==='map')v.innerHTML=`<div class="mapouter">${moveBar()}<div class="mapbox" id="mapbox">${mapSVG()}</div>
+      <div class="zbar"><button onclick="zoomMap(1)">＋</button><button onclick="zoomMap(-1)">－</button><button onclick="UI.sel=homeCity();UI.center=true;render()" style="font-size:15px">🏯</button></div></div>`
+    +lordsRow()+tipBar()+`<div class="pan">${cityPanel()}</div>`;
   else if(UI.tab==='gens')v.innerHTML=gensTab();
   else if(UI.tab==='dex')v.innerHTML=dexTab();
   else v.innerHTML=menuTab();
+  const mb=$('#mapbox');
+  if(mb){
+    if(UI.center||!keep){const c=S.cities[UI.sel]||S.cities[homeCity()];const w=mb.scrollWidth,h=mb.scrollHeight;
+      if(c){mb.scrollLeft=c.x/MAP_W*w-mb.clientWidth/2;mb.scrollTop=c.y/MAP_H*h-mb.clientHeight/2;}UI.center=false;}
+    else{mb.scrollLeft=keep[0];mb.scrollTop=keep[1];}
+  }
+}
+function zoomMap(d){
+  const Z=[1,1.3,1.6,2];let i=Z.indexOf(UI.zoom||1.3);i=clamp(i+d,0,Z.length-1);UI.zoom=Z[i];UI.center=true;render();
 }
 function mapSVG(){
-  let s=`<svg viewBox="0 0 340 338" class="map">
-  <path d="M20,108 C70,96 120,118 160,110 S240,96 330,112" fill="none" stroke="#3d6a8a" stroke-width="5" opacity=".5"/>
-  <path d="M20,236 C70,250 120,268 170,270 S260,236 336,240" fill="none" stroke="#3d6a8a" stroke-width="6" opacity=".5"/>
-  <text x="322" y="104" font-size="8" fill="#6f9cbf" text-anchor="end">황하</text>
-  <text x="328" y="232" font-size="8" fill="#6f9cbf" text-anchor="end">장강</text>`;
+  const zw=Math.round(MAP_W*(UI.zoom||1.3));
+  let s=`<svg viewBox="0 0 ${MAP_W} ${MAP_H}" class="map">
+  <path d="M10,120 C40,150 90,215 140,205 C190,195 220,212 265,212 C310,212 340,192 380,196 C420,200 450,185 470,178 C510,165 560,172 600,168" fill="none" stroke="#3d6a8a" stroke-width="7" opacity=".45"/>
+  <path d="M25,440 C70,470 110,470 140,452 C165,430 190,440 225,462 C260,478 300,430 335,428 C370,426 400,450 430,438 C470,420 500,395 540,388 C570,383 590,392 600,395" fill="none" stroke="#3d6a8a" stroke-width="8" opacity=".45"/>
+  <path d="M125,312 C150,318 175,330 200,340 C220,350 235,375 245,392 C265,410 300,418 330,420" fill="none" stroke="#3d6a8a" stroke-width="4" opacity=".4"/>
+  <path d="M440,375 C470,365 500,350 540,340 C560,335 580,330 600,330" fill="none" stroke="#3d6a8a" stroke-width="3" opacity=".3"/>
+  <text x="585" y="160" font-size="11" fill="#6f9cbf" text-anchor="end">황하</text>
+  <text x="595" y="410" font-size="11" fill="#6f9cbf" text-anchor="end">장강</text>
+  <text x="195" y="332" font-size="9" fill="#6f9cbf">한수</text>`;
   EDGES.forEach(([a,b])=>{const A=S.cities[a],B=S.cities[b];s+=`<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="#6b5538" stroke-width="1.5" stroke-dasharray="3 3"/>`;});
   let o='';
-  const P=(x,y)=>`left:${(x/340*100).toFixed(2)}%;top:${(y/338*100).toFixed(2)}%`;
+  const P=(x,y)=>`left:${(x/MAP_W*100).toFixed(2)}%;top:${(y/MAP_H*100).toFixed(2)}%`;
   Object.values(S.cities).forEach(c=>{
     const col=c.owner?S.forces[c.owner].color:'#5a4a38';const mine=c.owner===S.player;
     const idle=mine?idleIn(c.id).length:0;
     const talent=gensAt(c.id,'free').length+gensAt(c.id,'prisoner').length;
     s+=`<g onclick="selCity('${c.id}')">`;
     if(UI.hl&&c.owner===UI.hl)s+=`<circle cx="${c.x}" cy="${c.y}" r="19" fill="${col}" opacity=".35"/>`;
-    if(UI.sel===c.id)s+=`<circle cx="${c.x}" cy="${c.y}" r="17" class="ring"/>`;
+    if(UI.mv&&UI.mv.pick&&UI.mv.reach.includes(c.id))s+=`<circle cx="${c.x}" cy="${c.y}" r="17" class="mvok"/>`;
+    else if(UI.mv&&UI.mv.pick&&UI.mv.from===c.id)s+=`<circle cx="${c.x}" cy="${c.y}" r="17" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="4 3"/>`;
+    else if(UI.sel===c.id)s+=`<circle cx="${c.x}" cy="${c.y}" r="17" class="ring"/>`;
     s+=`<circle cx="${c.x}" cy="${c.y}" r="18" fill="transparent"/>`;
     s+=`<circle cx="${c.x}" cy="${c.y}" r="${mine?11:9}" fill="${col}" stroke="${mine?'#ffe39a':'#140e08'}" stroke-width="2"/>`;
     s+=`<text x="${c.x}" y="${c.y+22}" class="cn">${c.id}</text>`;
@@ -676,9 +620,19 @@ function mapSVG(){
     const r=S.gens[f.ruler];if(!r||r.status!=='serve'||r.force!==f.name||!S.cities[r.city])return;
     const c=S.cities[r.city];o+=`<div class="rmark" style="${P(c.x,c.y)}">${face(r)}<i>👑</i></div>`;
   });
-  return `<div class="mapwrap">${s}</svg>${o}</div>`;
+  return `<div class="mapwrap" style="width:${zw}px">${s}</svg>${o}</div>`;
 }
-function selCity(id){UI.sel=id;render();}
+function selCity(id){
+  const m=UI.mv;
+  if(m&&m.pick){
+    if(m.reach.includes(id)){m.to=id;m.pick=false;if(!m.sel.length)m.sel=[];renderMove();}
+    else if(id===m.from)toast('출발 도시입니다. 초록 테두리 도시를 누르세요');
+    else toast(`${id}${j(id,'은','는').slice(id.length)} 아군 땅으로 이어져 있지 않아 갈 수 없어요`);
+    return;
+  }
+  UI.sel=id;render();
+}
+function goCity(id){UI.sel=id;UI.tab='map';UI.center=true;render();$('#view').scrollTop=0;}
 function cityPanel(){
   const c=S.cities[UI.sel];if(!c)return '<div class="hint">지도에서 도시를 눌러보세요</div>';
   const mine=c.owner===S.player;
@@ -722,7 +676,7 @@ function dexTab(){
   const all=G().slice().sort((a,b)=>rarity(b)-rarity(a)||total(b)-total(a));
   const cnt=[5,4,3,2,1].map(r=>{const a=all.filter(g=>rarity(g)===r);return `<span class="st r${r}">${stars(r)} ${a.filter(g=>S.dex.includes(g.id)).length}/${a.length}</span>`;}).join('');
   const cell=g=>{
-    const own=S.dex.includes(g.id),known=own||g.status!=='hidden';const r=rarity(g);
+    const own=S.dex.includes(g.id),known=own||(g.status!=='hidden'&&g.status!=='unborn');const r=rarity(g);
     if(!known)return `<div class="dx" style="--c:#4a3a28"><div class="face unk" style="--c:#4a3a28"><span>?</span></div><span>???</span><small class="st r${r}">${stars(r)}</small></div>`;
     return `<div class="dx" style="--c:${colorOf(g)}" onclick="showGen('${g.id}')">${face(g,own?'':'gray')}<span style="${own?'':'color:var(--dim)'}">${g.name}</span><small class="st r${r}">${stars(r)}</small></div>`;
   };
@@ -734,11 +688,11 @@ function dexTab(){
     fs.forEach(f=>groups.push([`${f}군${f===S.player?' (나)':''}`,S.forces[f].color,all.filter(g=>g.status==='serve'&&g.force===f)]));
     groups.push(['⭐ 재야','#8b7355',all.filter(g=>g.status==='free')]);
     groups.push(['⛓️ 감옥','#6b6b6b',all.filter(g=>g.status==='prisoner')]);
-    groups.push(['❓ 아직 못 찾은 인재','#4a3a28',all.filter(g=>g.status==='hidden')]);
+    groups.push(['❓ 아직 못 찾은 인재','#4a3a28',all.filter(g=>g.status==='hidden'||g.status==='unborn')]);
     body=groups.filter(x=>x[2].length).map(([t,c,a])=>`<div class="dsec" style="--c:${c}"><span class="dot" style="background:${c}"></span>${t}<small>수집 ${a.filter(g=>S.dex.includes(g.id)).length}/${a.length}</small></div><div class="grid">${a.map(cell).join('')}</div>`).join('');
   }
-  return `<div class="dexhead"><b>장수 도감</b> <span style="color:var(--dim)">${S.dex.length} / ${TOTAL}</span>
-  <div class="prog"><div style="width:${S.dex.length/TOTAL*100}%"></div></div><div class="rc">${cnt}</div></div>
+  return `<div class="dexhead"><b>장수 도감</b> <span style="color:var(--dim)">${S.dex.length} / ${TOT()}</span>
+  <div class="prog"><div style="width:${S.dex.length/TOT()*100}%"></div></div><div class="rc">${cnt}</div></div>
   <div class="sorts" style="padding-top:0">${[['force','세력별'],['rank','등급순']].map(([m,n])=>`<button class="${(UI.dexMode||'force')===m?'on':''}" onclick="UI.dexMode='${m}';render()">${n}</button>`).join('')}</div>
   ${body}`;
 }
@@ -751,7 +705,7 @@ function menuTab(){
   ${dead?`<div class="sec"><span>멸망: ${dead}</span></div>`:''}
   <button class="btn pri" onclick="openSaves()">💾 저장 / 불러오기</button>
   <button class="btn" onclick="openHelp()">📖 게임 방법</button>
-  <button class="btn" onclick="if(confirm('지금 게임을 버리고 새로 시작할까요?'))showSelect(),$('#title').classList.add('on')">🔄 새 게임</button>
+  <button class="btn" onclick="if(confirm('지금 게임을 버리고 새로 시작할까요?'))showScen(),$('#title').classList.add('on')">🔄 새 게임</button>
   <div class="hint" style="font-size:12px">행동할 때마다 자동 저장됩니다.<br>천하쟁패 v1</div></div>`;
 }
 function showGen(id){
@@ -761,14 +715,14 @@ function showGen(id){
   const mineCity=S.cities[g.city]&&S.cities[g.city].owner===S.player;
   openModal(`<div style="display:flex;gap:14px;align-items:center">${face(g,'big')}<div>
     <h3>${g.name} <span class="st r${r}">${stars(r)}</span></h3><div class="sub">${TITLES[g.name]||''}</div>
-    <div style="font-size:13px">${st}</div>${FAV[g.name]?`<div style="font-size:12px;color:var(--gold)">흠모: ${FAV[g.name]}</div>`:''}
+    <div style="font-size:13px">${st}</div>${FAV[g.name]?`<div style="font-size:12px;color:var(--gold)">흠모: ${favOf(g.name).join(", ")}</div>`:''}
     ${S.dex.includes(g.id)?'<div style="font-size:12px;color:var(--green)">📜 도감 등록됨</div>':''}</div></div>
     <div class="bars">${bar('무력',g.war)}${bar('지력',g.int)}${bar('통솔',g.lead)}${bar('매력',g.cha)}${g.status!=='free'&&g.status!=='hidden'?bar('충성',g.loy):''}</div>
     ${g.grace?'<div class="sub">🙏 예전에 석방해 준 은혜를 기억하고 있다 (등용 +15%)</div>':''}
     ${(g.status==='free'||g.status==='prisoner')&&mineCity?`<button class="btn pri" onclick="closeModal();UI.sel='${g.city}';UI.tab='map';cmdRecruit('${g.id}')">🤝 ${g.status==='prisoner'?'설득하러 가기':'등용하러 가기'}</button>`:''}
     ${g.status==='prisoner'&&mineCity?`<button class="btn" onclick="if(confirm('${g.name}을(를) 석방할까요? 은혜를 기억해서 나중에 등용하기 쉬워집니다.')){releaseGen(S.gens['${g.id}']);after();closeModal();toast('${g.name} 석방')}">🔓 석방하기</button>`:''}
     ${S.dex.includes(g.id)?`<div class="row2"><button class="btn" onclick="pickPhoto('${g.id}')">📷 내 사진으로 바꾸기</button>${PHOTOS[g.name]?`<button class="btn" onclick="delPhoto('${g.id}')">기본 그림</button>`:''}</div>`:''}
-    <div class="row2"><button class="btn" onclick="closeModal();UI.sel='${g.city}';tab('map')">📍 ${g.city} 보기</button><button class="btn" onclick="closeModal()">닫기</button></div>`);
+    <div class="row2"><button class="btn" onclick="closeModal();goCity('${g.city}')">📍 ${g.city} 보기</button><button class="btn" onclick="closeModal()">닫기</button></div>`);
 }
 
 /* ===================== 고르기 창 ===================== */
@@ -827,7 +781,7 @@ function showFound(t,g){
   const r=rarity(t);const more=idleIn(t.city).length;
   if(navigator.vibrate)navigator.vibrate(r>=4?[60,40,120]:40);
   openModal(`<h3>🔍 재야 인재 발견!</h3><div class="sub">${j(g.name,'이','가')} ${t.city}에서 인재를 찾아냈다</div>
-    ${card(t,TITLES[t.name]||'재야')}${FAV[t.name]?`<div class="sub">${j(t.name,'은','는')} ${j(FAV[t.name],'을','를')} 흠모한다고 한다</div>`:''}
+    ${card(t,TITLES[t.name]||'재야')}${FAV[t.name]?`<div class="sub">${j(t.name,'은','는')} ${j(favOf(t.name).join("·"),'을','를')} 흠모한다고 한다</div>`:''}
     ${more?`<button class="btn pri" onclick="closeModal();cmdRecruit('${t.id}')">🤝 바로 등용 시도</button>`:'<div class="sub">이번 달은 남은 장수가 없어요. 다음 달에 등용해 보세요.</div>'}
     <button class="btn" onclick="closeModal()">닫기</button>`);
 }
@@ -836,7 +790,7 @@ function recruitChance(rec,t){
   if(t.status==='prisoner')p+=.1-(t.loy-60)/80;
   if(t.grace)p+=.15;
   if(rec.id===S.forces[S.player].ruler)p+=.1;
-  if(FAV[t.name]===S.forces[S.player].ruler)p+=.25;
+  if(favOf(t.name).includes(S.forces[S.player].ruler))p+=.25;
   return clamp(p,.05,.95);
 }
 function cmdRecruit(tid){
@@ -879,26 +833,48 @@ function showGet(g,isNew){
 function closeGet(){$('#get').classList.remove('on');}
 
 /* ===================== 이동 ===================== */
+// 아군 땅으로 이어진 도시는 어디든 이동 가능 (한 달에 한 번)
+function reachOwn(from){
+  const seen=new Set([from]),q=[from];
+  while(q.length){const c=q.shift();(ADJ[c]||[]).forEach(n=>{if(!seen.has(n)&&S.cities[n].owner===S.player){seen.add(n);q.push(n);}});}
+  seen.delete(from);return [...seen];
+}
 function cmdMove(){
-  const c=curCity(),idle=needIdle(c);if(!idle)return;
-  const dests=ADJ[c.id].filter(n=>S.cities[n].owner===S.player);
-  if(!dests.length)return toast('인접한 아군 도시가 없습니다');
-  chooseGen(idle,'누구를 이동시킬까?',g=>'',g=>{
-    UI.mv={g:g.id,from:c.id,to:dests[0],troops:0};renderMove();
-  },'병력을 함께 옮길 수 있습니다');
+  const c=curCity(),idle=idleIn(c.id);
+  if(!idle.length&&c.troops<100)return toast('이동할 장수나 병력이 없습니다');
+  const reach=reachOwn(c.id);
+  if(!reach.length)return toast('이어진 아군 도시가 없습니다');
+  UI.mv={from:c.id,reach,sel:[],troops:0,pick:true};
+  UI.tab='map';render();$('#view').scrollTop=0;
+  toast('지도에서 도착할 도시(초록 테두리)를 누르세요');
+}
+function cancelMove(){UI.mv=null;closeModal();render();}
+function moveBar(){
+  const m=UI.mv;if(!m||!m.pick)return '';
+  return `<div class="mvbar"><span>🚶 <b>${m.from}</b>에서 이동 — 지도에서 <b style="color:#7ee07e">초록 도시</b>를 누르세요 (아군 땅으로 이어진 곳 어디든)</span><button onclick="cancelMove()">취소</button></div>`;
 }
 function renderMove(){
-  const m=UI.mv,c=S.cities[m.from],g=S.gens[m.g];
-  openModal(`<h3>${g.name} 이동</h3><div class="sub">${m.from}에서 출발</div>
-  ${ADJ[m.from].filter(n=>S.cities[n].owner===S.player).map(n=>`<button class="citybtn" style="${m.to===n?'border-color:var(--gold)':''}" onclick="UI.mv.to='${n}';renderMove()"><b>${n}</b><small>병력 ${fmt(S.cities[n].troops)} · 장수 ${gensAt(n,'serve',S.player).length}</small></button>`).join('')}
-  <div class="sec"><span>함께 옮길 병력</span><b id="mvt">${fmt(m.troops)}</b></div>
+  const m=UI.mv,c=S.cities[m.from],idle=idleIn(m.from);
+  if(m.troops>c.troops)m.troops=c.troops;
+  openModal(`<h3>🚶 ${m.from} → ${m.to}</h3><div class="sub">함께 보낼 장수를 모두 고르세요 (누를 때마다 선택/해제)</div>
+  <div class="row2" style="margin-bottom:8px"><button class="btn" style="margin:0;height:40px" onclick="UI.mv.sel=idleIn(UI.mv.from).map(g=>g.id);renderMove()">✅ 모두 선택</button><button class="btn" style="margin:0;height:40px" onclick="UI.mv.sel=[];renderMove()">모두 해제</button></div>
+  ${idle.length?idle.map(g=>card(g,isRuler(g)?'👑 군주':'',`mvToggle('${g.id}')`,m.sel.includes(g.id)?'pick':'')).join(''):'<div class="sub">이번 달 움직일 수 있는 장수가 없어요. 병력만 보낼 수 있어요.</div>'}
+  <div class="sec"><span>함께 옮길 병력 (최대 ${fmt(c.troops)})</span><b id="mvt">${fmt(m.troops)}</b></div>
   <input type="range" min="0" max="${c.troops}" step="100" value="${m.troops}" oninput="UI.mv.troops=+this.value;$('#mvt').textContent=fmt(this.value)">
-  <button class="btn pri" onclick="doMove()">이동</button><button class="btn" onclick="closeModal()">취소</button>`);
+  <div class="row2" style="margin-top:2px"><button class="btn" style="height:38px" onclick="UI.mv.troops=0;renderMove()">0</button><button class="btn" style="height:38px" onclick="UI.mv.troops=Math.floor(S.cities[UI.mv.from].troops/200)*100;renderMove()">절반</button><button class="btn" style="height:38px" onclick="UI.mv.troops=S.cities[UI.mv.from].troops;renderMove()">전부</button></div>
+  ${m.sel.length===gensAt(m.from,'serve',S.player).length&&m.sel.length?`<div class="sub" style="color:var(--red)">⚠ ${m.from}에 장수가 아무도 남지 않아요</div>`:''}
+  <button class="btn pri" onclick="doMove()" ${m.sel.length||m.troops?'':'disabled'}>이동 (장수 ${m.sel.length}명 · 병력 ${fmt(m.troops)})</button>
+  <div class="row2"><button class="btn" onclick="UI.mv.pick=true;closeModal();render()">🗺️ 도착지 다시 고르기</button><button class="btn" onclick="cancelMove()">취소</button></div>`);
 }
+function mvToggle(id){const s=UI.mv.sel,i=s.indexOf(id);if(i>=0)s.splice(i,1);else s.push(id);renderMove();}
 function doMove(){
-  const m=UI.mv,g=S.gens[m.g],a=S.cities[m.from],b=S.cities[m.to];
+  const m=UI.mv,a=S.cities[m.from],b=S.cities[m.to];
   const t=Math.min(m.troops,a.troops);a.troops-=t;b.troops=Math.min(30000,b.troops+t);
-  g.city=m.to;g.acted=true;closeModal();toast(`${j(g.name,'이','가')} ${j(m.to,'으로','로')} 이동했다`);after();
+  const gs=m.sel.map(id=>S.gens[id]).filter(g=>g&&g.city===m.from&&!g.acted);
+  gs.forEach(g=>{g.city=m.to;g.acted=true;});
+  UI.mv=null;closeModal();
+  toast(`${m.to}${j(m.to,'으로','로').slice(m.to.length)} ${gs.length?`장수 ${gs.length}명`:''}${gs.length&&t?' · ':''}${t?`병력 ${fmt(t)}`:''} 이동 완료`);
+  after();
 }
 
 /* ===================== 출진 ===================== */
@@ -1088,7 +1064,7 @@ function autoAll(){
   });
   after();
   if(!rows.length){toast(F.gold<50?'금이 부족해서 할 수 있는 일이 없습니다':'모든 장수가 이미 행동했습니다');return;}
-  const fl=found.map(t=>card(t,`${t.city}에서 발견! 눌러서 등용하기`,`closeModal();UI.sel='${t.city}';tab('map');cmdRecruit('${t.id}')`)).join('');
+  const fl=found.map(t=>card(t,`${t.city}에서 발견! 눌러서 등용하기`,`closeModal();goCity('${t.city}');cmdRecruit('${t.id}')`)).join('');
   if(found.length&&navigator.vibrate)navigator.vibrate([60,40,120]);
   const left=myGens().filter(g=>!g.acted).length;
   openModal(`<h3>⚡ 자동 내정 완료</h3><div class="sub">장수 ${rows.length}명이 일했어요 · 금 ${fmt(g0)} → ${fmt(F.gold)}${left?` · 쉬는 장수 ${left}명 (금 부족 등)`:''}</div>
@@ -1171,7 +1147,7 @@ function openAdvisor(){
     ${list.map(x=>`<button class="adv ${x.pri>=85?'hi':''}" onclick="advGo('${x.city||''}')"><i>${x.icon}</i><span>${x.text}${x.city?' <small style="color:var(--dim)">▶ 보기</small>':''}</span></button>`).join('')}
     <div class="row2"><button class="btn" onclick="changeAdvisor()">🔄 참모 바꾸기</button><button class="btn pri" onclick="closeModal()">알겠소</button></div>`);
 }
-function advGo(c){closeModal();if(c){UI.sel=c;UI.tab='map';render();$('#view').scrollTop=0;}}
+function advGo(c){closeModal();if(c)goCity(c);}
 function changeAdvisor(){
   chooseGen(myGens().sort((x,y)=>y.int-x.int),'누구를 참모로 둘까?',g=>`지력 ${g.int} · ${g.int>=90?'조언 8가지':g.int>=75?'조언 5가지':'조언 3가지'}`,g=>{S.advisor=g.id;S.advisorPinned=true;save();openAdvisor();},'참모는 행동을 쓰지 않습니다. 지력이 높을수록 조언이 정확하고 많아요. (직접 고르지 않으면 지력이 가장 높은 장수가 자동으로 맡아요)');
 }
@@ -1195,13 +1171,20 @@ function lordInfo(f){
 function endTurn(){
   if(!S)return;
   const news=[],battles=[];
+  UI.mv=null;
   S.turn++;
   Object.keys(S.forces).filter(f=>f!==S.player&&S.forces[f].alive).sort(()=>Math.random()-.5)
     .forEach(f=>{if(S.forces[f].alive)aiTurn(f,news,battles);});
   prisonTick(news);
   const inc=economy(news);
   G().forEach(g=>g.acted=false);
-  S.month++;if(S.month>12){S.month=1;S.year++;}
+  S.month++;if(S.month>12){S.month=1;S.year++;
+    // 새해: 자라난 인재가 고향에 나타남
+    const grown=G().filter(g=>g.status==='unborn'&&(g.debut||0)<=S.year);
+    grown.forEach(g=>g.status='hidden');
+    if(grown.length){const mine=grown.filter(g=>S.cities[g.city]&&S.cities[g.city].owner===S.player);
+      news.push([`🌱 새해를 맞아 천하에 새로운 인재 ${grown.length}명이 나타났다는 소문이 돈다${mine.length?` — 우리 땅(${[...new Set(mine.map(g=>g.city))].join('·')})에도 ${mine.length}명!`:''}`,'good']);}
+  }
   save();render();
   if(!citiesOf(S.player).length)return gameOver();
   if(Object.values(S.forces).every(f=>f.name===S.player||!f.alive))return victory();
@@ -1263,12 +1246,12 @@ function aiTurn(f,news,battles){
   }
 }
 function gameOver(){
-  openModal(`<h3>패망…</h3><div class="sub">${S.player}군의 모든 도시를 잃었습니다.</div><div class="sub">모은 장수: ${S.dex.length} / ${TOTAL}</div>
+  openModal(`<h3>패망…</h3><div class="sub">${S.player}군의 모든 도시를 잃었습니다.</div><div class="sub">모은 장수: ${S.dex.length} / ${TOT()}</div>
     <button class="btn pri" onclick="closeModal();localStorage.removeItem(SAVE);showTitle()">처음부터</button>`);UI.lock=true;
 }
 function victory(){
-  openModal(`<div class="result" style="color:var(--gold)">🏆 천하통일!</div><div class="sub" style="text-align:center">${S.player}군이 ${S.year}년 ${S.month}월에 천하를 손에 넣었습니다.<br>도감 ${S.dex.length} / ${TOTAL}</div>
-    <button class="btn pri" onclick="closeModal()">계속 둘러보기</button><button class="btn" onclick="closeModal();showSelect();$('#title').classList.add('on')">새 게임</button>`);
+  openModal(`<div class="result" style="color:var(--gold)">🏆 천하통일!</div><div class="sub" style="text-align:center">${S.player}군이 ${S.year}년 ${S.month}월에 천하를 손에 넣었습니다.<br>도감 ${S.dex.length} / ${TOT()}</div>
+    <button class="btn pri" onclick="closeModal()">계속 둘러보기</button><button class="btn" onclick="closeModal();showScen();$('#title').classList.add('on')">새 게임</button>`);
 }
 function openHelp(first){
   openModal(`<h3>${first?`${S.player}군의 천하쟁패가 시작됩니다`:'게임 방법'}</h3><div class="help">
@@ -1287,8 +1270,8 @@ function openHelp(first){
 /* ===================== 시작 ===================== */
 (function init(){
   const s=loadSave();
-  if(s){S=s;migrate();UI.sel=FORCES[S.player][2];if(S.cities[UI.sel].owner!==S.player){const c=citiesOf(S.player)[0];if(c)UI.sel=c.id;}render();}
-  else showTitle();
+  if(s&&s.ver===SAVE_VER){S=s;migrate();UI.sel=homeCity();UI.center=true;render();}
+  else showTitle(s?'지도가 51개 도시로, 장수가 대폭 늘었어요! 예전 게임은 이어할 수 없어서 새 게임을 시작해 주세요.':'');
   if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();
 </script>
