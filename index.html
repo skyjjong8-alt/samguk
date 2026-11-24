@@ -210,6 +210,7 @@ input[type=range]{width:100%;accent-color:var(--gold);height:30px}
   <button data-t="map" onclick="tab('map')"><i>🗺️</i>지도</button>
   <button data-t="gens" onclick="tab('gens')"><i>⚔️</i>장수</button>
   <button data-t="dex" onclick="tab('dex')"><i>📜</i>도감</button>
+  <button data-t="forces" onclick="tab('forces')"><i>🚩</i>세력</button>
   <button data-t="menu" onclick="tab('menu')"><i>☰</i>메뉴</button>
 </div>
 <div id="modal" onclick="if(event.target===this&&!UI.lock)closeModal()"></div>
@@ -1014,6 +1015,7 @@ function render(){
     +lordsRow()+tipBar()+`<div class="pan">${cityPanel()}</div>`;
   else if(UI.tab==='gens')v.innerHTML=gensTab();
   else if(UI.tab==='dex')v.innerHTML=dexTab();
+  else if(UI.tab==='forces')v.innerHTML=forcesTab();
   else v.innerHTML=menuTab();
   const mb=$('#mapbox');
   if(mb){
@@ -1147,18 +1149,24 @@ function dexTab(){
   ${body}`;
 }
 function menuTab(){
-  const rows=Object.values(S.forces).filter(f=>f.alive).map(f=>{const cs=citiesOf(f.name);
-    return `<tr onclick="lordInfo('${f.name}')"><td style="text-align:left;display:flex;align-items:center;gap:6px">${face(S.gens[f.ruler],'sm')}<b style="color:${f.color}">${f.name}</b></td><td>${cs.length}</td><td>${G().filter(g=>g.force===f.name&&g.status==='serve').length}</td><td>${fmt(sum(cs,c=>c.troops))}</td></tr>`;}).join('');
-  const dead=Object.values(S.forces).filter(f=>!f.alive).map(f=>f.name).join(', ');
   return `<div class="pan">
   <button class="btn pri" style="margin-top:0" onclick="openSaves()">💾 저장 / 불러오기</button>
   <button class="btn" onclick="openHelp()">📖 게임 방법</button>
   <button class="btn" onclick="if(confirm('지금 게임을 버리고 새로 시작할까요?'))showScen(),$('#title').classList.add('on')">🔄 새 게임</button>
-  <div class="hint" style="font-size:12px;padding:10px">행동할 때마다 자동 저장됩니다.</div>
-  <div class="sec" style="margin-top:16px"><span>세력 현황 (누르면 자세히)</span><span>${S.year}년 ${S.month}월</span></div>
+  <div class="hint" style="font-size:12px;padding:10px">행동할 때마다 자동 저장됩니다.<br>천하쟁패 v2 · 세력 탭 추가판</div></div>`;
+}
+function forcesTab(){
+  const list=Object.values(S.forces).filter(f=>f.alive).map(f=>{const cs=citiesOf(f.name);
+    return {f,cs:cs.length,gn:G().filter(g=>g.force===f.name&&g.status==='serve').length,tr:sum(cs,c=>c.troops)};})
+    .sort((a,b)=>(b.f.name===S.player)-(a.f.name===S.player)||b.cs-a.cs||b.tr-a.tr);
+  const rows=list.map(x=>`<tr onclick="lordInfo('${x.f.name}')"><td style="text-align:left;display:flex;align-items:center;gap:6px">${face(S.gens[x.f.ruler],'sm')}<b style="color:${x.f.color}">${x.f.name}${x.f.name===S.player?' (나)':''}</b></td><td>${x.cs}</td><td>${x.gn}</td><td>${fmt(x.tr)}</td></tr>`).join('');
+  const dead=Object.values(S.forces).filter(f=>!f.alive).map(f=>f.name).join(', ');
+  const total=Object.keys(S.cities).length,mine=citiesOf(S.player).length;
+  return `<div class="pan"><div class="sec"><span>세력 현황 (누르면 자세히)</span><span>${S.year}년 ${S.month}월</span></div>
+  <div class="sub">천하 ${total}개 도시 중 우리 땅 <b style="color:var(--gold)">${mine}</b>개 · 남은 세력 ${list.length}개</div>
+  <div class="prog"><div style="width:${mine/total*100}%"></div></div>
   <table class="tbl"><tr><th style="text-align:left">세력</th><th>도시</th><th>장수</th><th>병력</th></tr>${rows}</table>
-  ${dead?`<div class="sec"><span>멸망: ${dead}</span></div>`:''}
-  <div class="hint" style="font-size:11px">천하쟁패 v1</div></div>`;
+  ${dead?`<div class="sec"><span>💀 멸망: ${dead}</span></div>`:''}</div>`;
 }
 function showGen(id){
   if(!id)return;const g=S.gens[id];const r=rarity(g);
