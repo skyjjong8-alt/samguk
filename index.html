@@ -20,7 +20,10 @@ b{font-weight:700}
 #top{display:flex;align-items:center;gap:8px;padding:8px 12px;padding-top:calc(8px + env(safe-area-inset-top));background:var(--panel);border-bottom:1px solid var(--line)}
 #top .date{font-size:13px;color:var(--dim)}
 #top .fn{font-weight:800;font-size:16px}
-#top .res{margin-left:auto;display:flex;gap:10px;font-size:13px;font-variant-numeric:tabular-nums}
+#top .res{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
+#top .res div{display:flex;gap:8px}
+.tsave{flex:none;width:50px;height:42px;border-radius:10px;background:var(--panel2);border:1px solid var(--gold)!important;font-size:10px;font-weight:700;color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:0;letter-spacing:-.5px}
+.tsave i{font-style:normal;font-size:16px;line-height:1}
 #view{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 #act{display:flex;gap:8px;padding:8px 12px;background:var(--panel);border-top:1px solid var(--line)}
 #act button{flex:1;height:46px;border-radius:12px;font-weight:800;font-size:15px}
@@ -76,22 +79,27 @@ b{font-weight:700}
 .arow .what{margin-left:auto;color:var(--gold);font-weight:700;white-space:nowrap}
 .dsec{display:flex;align-items:center;gap:8px;margin:14px 12px 8px;padding:6px 10px;border-radius:10px;background:linear-gradient(90deg,color-mix(in srgb,var(--c) 35%,transparent),transparent);border-left:4px solid var(--c);font-weight:800}
 .dsec small{margin-left:auto;color:var(--dim);font-weight:400}
-.slot{background:var(--panel);border-radius:12px;padding:10px;margin-bottom:8px;border:1px solid var(--line)}
-.slot .sl{font-size:13px;color:var(--dim);margin-bottom:6px}
-.slot .row2 .btn{height:40px;margin-top:0}
+.slot{display:flex;align-items:center;gap:8px;background:var(--panel);border-radius:12px;padding:8px 10px;margin-bottom:6px;border:1px solid var(--line)}
+.slot .sn{flex:none;width:24px;height:24px;border-radius:50%;background:var(--panel2);color:var(--gold);font-weight:800;text-align:center;line-height:24px;font-size:13px}
+.slot .si{flex:1;min-width:0;font-size:13px;line-height:1.35}
+.slot .si small{color:var(--dim);font-size:11px}
+.slot .sb{flex:none;height:38px;padding:0 11px;border-radius:9px;background:var(--panel2);border:1px solid var(--line);font-weight:700;font-size:13px}
+.slot .sb.pri{background:linear-gradient(#e9c06a,#c8963c);color:#2a1a08;border:0}
+.slot .sb:disabled{opacity:.35}
 .capb{display:flex;gap:6px;margin:-2px 0 10px}
 .capb .btn{height:40px;margin-top:0;font-size:14px}
 .capr{text-align:center;font-weight:800;padding:8px;border-radius:10px;margin:-2px 0 10px;background:var(--panel)}
 .mapouter{position:relative}
 .map .mvok{fill:#7ee07e33;stroke:#7ee07e;stroke-width:3;animation:pulse 1s ease-in-out infinite}
-.mvbar{position:absolute;left:8px;right:54px;bottom:8px;z-index:6;background:#0b2a10ee;border:1px solid #7ee07e;color:#fff;border-radius:12px;padding:8px 10px;font-size:13px;display:flex;align-items:center;gap:6px;line-height:1.35}
+.mvbar{background:#0b2a10;border-bottom:2px solid #7ee07e;color:#fff;padding:7px 10px;font-size:13px;display:flex;align-items:center;gap:6px;line-height:1.35}
 .mvbar button{margin-left:auto;flex:none;background:#fff;color:#111;border-radius:8px;padding:6px 10px;font-weight:800;font-size:13px}
 .mapbox{height:47vh;overflow:auto;-webkit-overflow-scrolling:touch;background:#1f1710;overscroll-behavior:contain;scrollbar-width:none}
 .mapbox::-webkit-scrollbar{display:none}
 .mapwrap{position:relative;aspect-ratio:600/610}
 .mapwrap .map{width:100%;height:100%;max-height:none}
-.zbar{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:6px;z-index:5}
-.zbar button{width:38px;height:38px;border-radius:10px;background:#000b;color:#fff;font-size:18px;font-weight:800;border:1px solid #fff3}
+.maptools{display:flex;align-items:center;gap:6px;padding:6px 10px 0 12px}
+.zbar{display:flex;gap:6px;flex:none}
+.zbar button{width:40px;height:34px;border-radius:9px;background:var(--panel2);color:var(--text);font-size:18px;font-weight:800;border:1px solid var(--line)}
 .rmark{position:absolute;transform:translate(-50%,-50%);pointer-events:none;z-index:1}
 .rmark .face{width:27px;height:27px;border-width:2px;box-shadow:0 0 0 1.5px #ffe39a,0 2px 6px #000a}
 .rmark i{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:11px;font-style:normal}
@@ -99,8 +107,8 @@ b{font-weight:700}
 .mstar{position:absolute;transform:translate(-50%,-50%);color:#ffd166;font-size:16px;text-shadow:0 0 3px #000,0 0 3px #000;pointer-events:none;z-index:2}
 .mjail{position:absolute;transform:translate(-50%,-50%);font-size:13px;filter:drop-shadow(0 0 2px #000);pointer-events:none;z-index:2}
 .map .atkok{fill:#ff5a4a33;stroke:#ff5a4a;stroke-width:3;animation:pulse 1s ease-in-out infinite}
-.mvbar.atk{background:#3a0d0aee;border-color:#ff5a4a}
-.maplegend{display:flex;gap:10px;justify-content:center;font-size:11px;color:var(--dim);padding:4px 0 0}
+.mvbar.atk{background:#3a0d0a;border-color:#ff5a4a}
+.maplegend{flex:1;display:flex;flex-wrap:wrap;gap:4px 9px;font-size:11px;color:var(--dim);min-width:0}
 .lords{display:flex;gap:6px;overflow-x:auto;padding:8px 12px 2px;scrollbar-width:none}
 .lord{display:flex;align-items:center;gap:5px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:3px 10px 3px 3px;white-space:nowrap;flex:none}
 .lord.on{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
@@ -921,34 +929,39 @@ function showTitle(msg){
   t.innerHTML=`<h1>天下爭霸</h1><p>천하쟁패 · 나만의 삼국지</p>${msg?`<div class="sub" style="max-width:320px;text-align:center;color:var(--gold)">${msg}</div>`:''}
     <button class="btn pri" onclick="showScen()">새 게임</button>
     ${has?'<button class="btn" onclick="continueGame()">이어하기</button>':''}
-    <button class="btn" onclick="openSaves()">💾 불러오기</button>`;
+    <button class="btn" onclick="openSaves('load')">📂 불러오기</button>`;
 }
 /* ---------- 저장 슬롯 / 백업 ---------- */
 const SLOT=i=>'chunha_slot_'+i;
 function readSlot(i){try{const t=localStorage.getItem(SLOT(i));return t?JSON.parse(t):null;}catch(e){return null;}}
-function openSaves(){
+function openSaves(mode){
+  if(!S)mode='load';
+  const showSave=mode!=='load',showLoad=mode!=='save';
   const rows=[1,2,3].map(i=>{const d=readSlot(i);
     const old=d&&d.ver!==SAVE_VER;
-    const info=d?`<b style="color:${d.forces&&d.forces[d.player]?d.forces[d.player].color:'var(--gold)'}">${d.player}군</b> · ${d.year}년 ${d.month}월 · 도감 ${d.dex.length}/${Object.keys(d.gens).length}${old?' <span style="color:var(--red)">(예전 지도 — 불러올 수 없음)</span>':''}<br><span style="font-size:11px">${new Date(d.savedAt||0).toLocaleString('ko-KR')}</span>`:'비어 있음';
-    return `<div class="slot"><div class="sl">슬롯 ${i} · ${info}</div><div class="row2">
-      <button class="btn" onclick="saveSlot(${i})" ${S?'':'disabled'}>💾 저장</button>
-      <button class="btn pri" onclick="loadSlot(${i})" ${d&&!old?'':'disabled'}>📂 불러오기</button></div></div>`;}).join('');
-  openModal(`<h3>💾 저장 / 불러오기</h3><div class="sub">지금 게임은 항상 자동 저장됩니다. 중요한 순간을 슬롯에 따로 남겨 두세요.</div>
+    const when=d?new Date(d.savedAt||0):null;
+    const info=d?`<b style="color:${d.forces&&d.forces[d.player]?d.forces[d.player].color:'var(--gold)'}">${d.player}군</b> ${d.year}년 ${d.month}월${old?' <span style="color:var(--red)">(예전 지도)</span>':''}<br><small>${when.getMonth()+1}/${when.getDate()} ${String(when.getHours()).padStart(2,'0')}:${String(when.getMinutes()).padStart(2,'0')} 저장</small>`:'<span style="color:var(--dim)">비어 있음</span>';
+    return `<div class="slot"><span class="sn">${i}</span><div class="si">${info}</div>
+      ${showSave?`<button class="sb ${mode==='save'?'pri':''}" onclick="saveSlot(${i})">${d?'덮어쓰기':'저장'}</button>`:''}
+      ${showLoad?`<button class="sb pri" onclick="loadSlot(${i})" ${d&&!old?'':'disabled'}>불러오기</button>`:''}</div>`;}).join('');
+  const title=mode==='save'?'💾 저장할 슬롯을 고르세요':mode==='load'?'📂 불러올 슬롯을 고르세요':'💾 저장 / 불러오기';
+  const sub=mode==='save'?'진행은 늘 자동 저장돼요. 중요한 순간을 슬롯에 따로 남겨 두세요.':mode==='load'?'불러오면 지금 진행 중인 게임 대신 그 저장으로 바뀌어요.':'';
+  openModal(`<h3>${title}</h3><div class="sub">${sub}</div>
     ${rows}
-    <div class="sec"><span>백업 파일 (폰 교체·브라우저 초기화 대비)</span></div>
-    <div class="row2"><button class="btn" onclick="exportSave()" ${S?'':'disabled'}>📤 파일로 내보내기</button><button class="btn" onclick="importSave()">📥 파일 불러오기</button></div>
+    <details style="margin-top:6px"><summary style="color:var(--dim);font-size:13px;padding:6px 0">📁 백업 파일 (폰 바꿀 때)</summary>
+    <div class="row2">${showSave?`<button class="btn" onclick="exportSave()">📤 파일로 내보내기</button>`:''}${showLoad?`<button class="btn" onclick="importSave()">📥 파일에서 가져오기</button>`:''}</div></details>
     <button class="btn" onclick="closeModal()">닫기</button>`);
 }
 function saveSlot(i){
   if(readSlot(i)&&!confirm(`슬롯 ${i}에 덮어쓸까요?`))return;
-  try{localStorage.setItem(SLOT(i),JSON.stringify({...S,savedAt:Date.now()}));toast(`슬롯 ${i}에 저장했습니다`);}catch(e){toast('저장 공간이 부족합니다');}
-  openSaves();
+  try{localStorage.setItem(SLOT(i),JSON.stringify({...S,savedAt:Date.now()}));toast(`💾 슬롯 ${i}에 저장했습니다`);}catch(e){toast('저장 공간이 부족합니다');openSaves('save');return;}
+  closeModal();UI.mv=null;UI.atk=null;UI.tab='map';render();$('#view').scrollTop=0;
 }
 function useLoaded(d){
   if(d.ver!==SAVE_VER){toast('예전 지도(17개 도시)로 저장된 게임이라 불러올 수 없습니다');return;}
   delete d.savedAt;S=d;migrate();save();
   UI.sel=homeCity();UI.center=true;
-  $('#title').classList.remove('on');closeModal();UI.tab='map';render();
+  $('#title').classList.remove('on');closeModal();UI.mv=null;UI.atk=null;UI.tab='map';render();$('#view').scrollTop=0;
 }
 function loadSlot(i){
   const d=readSlot(i);if(!d)return;
@@ -1005,13 +1018,14 @@ function render(){
   if(!S)return;
   const F=S.forces[S.player];
   $('#top').innerHTML=`<div><div class="date">${S.year}년 ${S.month}월</div><div class="fn" style="color:${F.color}">${S.player}군</div></div>
-    <div class="res"><span>💰${fmt(F.gold)}</span><span>🌾${fmt(F.food)}</span><span>📜${S.dex.length}/${TOT()}</span></div>`;
+    <div class="res"><div><span>💰${fmt(F.gold)}</span><span>🌾${fmt(F.food)}</span></div><div><span>📜도감 ${S.dex.length}/${TOT()}</span></div></div>
+    <button class="tsave" onclick="openSaves('save')"><i>💾</i>저장</button><button class="tsave" onclick="openSaves('load')"><i>📂</i>불러오기</button>`;
   document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===UI.tab));
   const v=$('#view');
   const mb0=$('#mapbox'),keep=mb0?[mb0.scrollLeft,mb0.scrollTop]:null;
-  if(UI.tab==='map')v.innerHTML=`<div class="mapouter">${moveBar()}<div class="mapbox" id="mapbox">${mapSVG()}</div>
-      <div class="zbar"><button onclick="zoomMap(1)">＋</button><button onclick="zoomMap(-1)">－</button><button onclick="UI.sel=homeCity();UI.center=true;render()" style="font-size:15px">🏯</button></div></div>`
-    +`<div class="maplegend"><span>👑 군주</span><span><b style="color:#ffd166">★</b> 재야 인재</span><span>⛓️ 감옥(포로)</span><span><b style="color:#e8604e">●</b> 쉬는 장수</span></div>`
+  if(UI.tab==='map')v.innerHTML=`${moveBar()}<div class="mapouter"><div class="mapbox" id="mapbox">${mapSVG()}</div></div>`
+    +`<div class="maptools"><div class="maplegend"><span>👑군주</span><span><b style="color:#ffd166">★</b>재야</span><span>⛓️감옥</span><span><b style="color:#e8604e">●</b>쉬는 장수</span></div>
+      <div class="zbar"><button onclick="zoomMap(-1)" aria-label="축소">－</button><button onclick="zoomMap(1)" aria-label="확대">＋</button><button onclick="UI.sel=homeCity();UI.center=true;render()" style="font-size:14px" aria-label="본거지로">🏯</button></div></div>`
     +lordsRow()+tipBar()+`<div class="pan">${cityPanel()}</div>`;
   else if(UI.tab==='gens')v.innerHTML=gensTab();
   else if(UI.tab==='dex')v.innerHTML=dexTab();
@@ -1110,7 +1124,7 @@ function cityPanel(){
   }else{
     h+=`<div class="sec"><span>${c.owner?'장수 '+serve.length+'명':'주둔 장수 없음'}</span></div>`;
   }
-  h+=serve.sort((a,b)=>a.acted-b.acted||total(b)-total(a)).map(g=>card(g,isRuler(g)?'👑 군주':'',`showGen('${g.id}')`)).join('');
+  h+=serve.sort(byStar).map(g=>card(g,isRuler(g)?'👑 군주':'',`showGen('${g.id}')`)).join('');
   if(free.length)h+=`<div class="sec"><span>⭐ 재야 인재</span><span>${mine?'등용 가능':'이 도시를 차지하면 등용 가능'}</span></div>`+free.map(g=>card(g,TITLES[g.name]||'재야',`showGen('${g.id}')`)).join('');
   if(pris.length)h+=`<div class="sec"><span>⛓️ 감옥</span><span>${mine?'설득해서 등용 가능 · 탈옥 주의':''}</span></div>`+pris.map(g=>card(g,`⛓️ ${g.jail||0}개월째 · 충성 ${g.loy}${g.prev?' · 전 '+g.prev+'군':''}`,`showGen('${g.id}')`)).join('');
   return h;
@@ -1150,10 +1164,9 @@ function dexTab(){
 }
 function menuTab(){
   return `<div class="pan">
-  <button class="btn pri" style="margin-top:0" onclick="openSaves()">💾 저장 / 불러오기</button>
-  <button class="btn" onclick="openHelp()">📖 게임 방법</button>
+  <button class="btn" style="margin-top:0" onclick="openHelp()">📖 게임 방법</button>
   <button class="btn" onclick="if(confirm('지금 게임을 버리고 새로 시작할까요?'))showScen(),$('#title').classList.add('on')">🔄 새 게임</button>
-  <div class="hint" style="font-size:12px;padding:10px">행동할 때마다 자동 저장됩니다.<br>천하쟁패 v2 · 세력 탭 추가판</div></div>`;
+  <div class="hint" style="font-size:12px;padding:10px">행동할 때마다 자동 저장됩니다.<br>슬롯 저장·불러오기는 맨 위 💾저장 · 📂불러오기 버튼<br>천하쟁패 v5</div></div>`;
 }
 function forcesTab(){
   const list=Object.values(S.forces).filter(f=>f.alive).map(f=>{const cs=citiesOf(f.name);
@@ -1200,6 +1213,8 @@ function chooseCity(list,title,sub,cb){
 /* ===================== 내정 명령 ===================== */
 function curCity(){return S.cities[UI.sel]}
 function after(){save();render();}
+// 정렬: 별(등급) 많은 순 → 같은 등급이면 능력치 합 높은 순
+function byStar(a,b){return rarity(b)-rarity(a)||total(b)-total(a);}
 function needIdle(c){const idle=idleIn(c.id);if(!idle.length){toast('이번 달 행동 가능한 장수가 없습니다');return null}return idle;}
 function devAmt(g){return Math.round(g.int/6+ri(4,8))}
 function draftAmt(g){return Math.round(400+g.cha*4+g.lead*4)}
@@ -1320,7 +1335,7 @@ function renderMove(){
   if(m.troops>c.troops)m.troops=c.troops;
   openModal(`<h3>🚶 ${m.from} → ${m.to}</h3><div class="sub">함께 보낼 장수를 모두 고르세요 (누를 때마다 선택/해제)</div>
   <div class="row2" style="margin-bottom:8px"><button class="btn" style="margin:0;height:40px" onclick="UI.mv.sel=idleIn(UI.mv.from).map(g=>g.id);renderMove()">✅ 모두 선택</button><button class="btn" style="margin:0;height:40px" onclick="UI.mv.sel=[];renderMove()">모두 해제</button></div>
-  ${idle.length?idle.map(g=>card(g,isRuler(g)?'👑 군주':'',`mvToggle('${g.id}')`,m.sel.includes(g.id)?'pick':'')).join(''):'<div class="sub">이번 달 움직일 수 있는 장수가 없어요. 병력만 보낼 수 있어요.</div>'}
+  ${idle.length?idle.sort(byStar).map(g=>card(g,isRuler(g)?'👑 군주':'',`mvToggle('${g.id}')`,m.sel.includes(g.id)?'pick':'')).join(''):'<div class="sub">이번 달 움직일 수 있는 장수가 없어요. 병력만 보낼 수 있어요.</div>'}
   <div class="sec"><span>함께 옮길 병력 (최대 ${fmt(c.troops)})</span><b id="mvt">${fmt(m.troops)}</b></div>
   <input type="range" min="0" max="${c.troops}" step="100" value="${m.troops}" oninput="UI.mv.troops=+this.value;$('#mvt').textContent=fmt(this.value)">
   <div class="row2" style="margin-top:2px"><button class="btn" style="height:38px" onclick="UI.mv.troops=0;renderMove()">0</button><button class="btn" style="height:38px" onclick="UI.mv.troops=Math.floor(S.cities[UI.mv.from].troops/200)*100;renderMove()">절반</button><button class="btn" style="height:38px" onclick="UI.mv.troops=S.cities[UI.mv.from].troops;renderMove()">전부</button></div>
@@ -1368,7 +1383,7 @@ function renderWar(){
   openModal(`<h3>⚔️ ${w.from} → ${w.to}</h3>
   <div class="sub">${T.owner?T.owner+'군':'의용군'} 병력 ${fmt(T.troops)} · 수비 장수: ${D.map(g=>g.name).join(', ')||'없음'}</div>
   <div class="sec"><span>출진 장수 (최대 3명)</span><span>${w.sel.length}/3</span></div>
-  ${idle.map(g=>card(g,'',`warToggle('${g.id}')`,w.sel.includes(g.id)?'pick':(w.sel.length>=3?'off':''))).join('')}
+  ${idle.sort(byStar).map(g=>card(g,'',`warToggle('${g.id}')`,w.sel.includes(g.id)?'pick':(w.sel.length>=3?'off':''))).join('')}
   <div class="sec"><span>출진 병력 (최대 ${fmt(c.troops)})</span><b id="wt">${fmt(w.troops)}</b></div>
   <input type="range" min="100" max="${c.troops}" step="100" value="${w.troops}" oninput="UI.war.troops=+this.value;$('#wt').textContent=fmt(this.value);const e=warEst();$('#we').textContent=e[0];$('#we').style.color=e[1]">
   <div class="est" id="we" style="color:${e[1]}">${e[0]}</div>
